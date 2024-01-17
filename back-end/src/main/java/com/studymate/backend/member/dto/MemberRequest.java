@@ -34,6 +34,5 @@ public class MemberRequest {
     private Interests interests;
     @NotBlank
     private String nickname;
-    private String profileUrl;
     private Set<Authority> authoritiesDtoSet;
 }

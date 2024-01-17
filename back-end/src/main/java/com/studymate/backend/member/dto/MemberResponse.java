@@ -19,6 +19,5 @@ public class MemberResponse {
     private Part part;
     private String email;
     private Interests interests;
-    private ProfileImg profileUrl;
     private Set<Authority> authoritiesDtoSet;
 }

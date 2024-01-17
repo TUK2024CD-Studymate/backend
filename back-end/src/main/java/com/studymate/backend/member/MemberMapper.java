@@ -50,7 +50,6 @@ public class MemberMapper {
                 .nickname(member.getNickname())
                 .interests(member.getInterests())
                 .name(member.getName())
-                .profileUrl(member.getProfileUrl())
                 .authoritiesDtoSet(member.getAuthorities().stream()
                         .map(authority -> Authority.builder().authorityName(authority.getAuthorityName()).build())
                         .collect(Collectors.toSet()))
