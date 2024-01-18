@@ -1,5 +1,6 @@
 package com.studymate.backend.member;
 
+import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.domain.Authority;
 import com.studymate.backend.member.domain.Member;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class MemberMapper {
 
     private final PasswordEncoder passwordEncoder;
+    private final ProfileImgRepository profileImgRepository;
 
     public Member toEntity(MemberRequest request) {
 
@@ -44,11 +46,15 @@ public class MemberMapper {
     public MemberResponse toResponse(Member member) {
         if (member == null) return null;
 
+        ProfileImg image = profileImgRepository.findByMember(member);
+        String url = image.getUrl();
+
         return MemberResponse.builder()
                 .email(member.getEmail())
                 .part(member.getPart())
                 .nickname(member.getNickname())
                 .interests(member.getInterests())
+                .imageUrl(url)
                 .name(member.getName())
                 .authoritiesDtoSet(member.getAuthorities().stream()
                         .map(authority -> Authority.builder().authorityName(authority.getAuthorityName()).build())

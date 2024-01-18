@@ -57,4 +57,8 @@ public class MemberController {
     public ResponseEntity<MemberResponse> getMyUserInfo(HttpServletRequest request) {
         return ResponseEntity.ok(memberService.getMyMemberWithAuthorities());
     }
+
+//    @PutMapping("/user")
+//    @PreAuthorize("hasAnyRole('USER')")
+//    public ResponseEntity<MemberResponse>
 }
