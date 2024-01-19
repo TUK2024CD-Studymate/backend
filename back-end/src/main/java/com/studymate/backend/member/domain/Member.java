@@ -2,6 +2,7 @@ package com.studymate.backend.member.domain;
 
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.global.BaseTimeEntity;
+import com.studymate.backend.member.dto.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,6 +41,13 @@ public class Member extends BaseTimeEntity{
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     @ManyToMany
     private Set<Authority> authorities;
+
+    public void update(MemberUpdateRequest request) {
+        this.name = request.getName();
+        this.part = request.getPart();
+        this.interests = request.getInterests();
+        this.nickname = request.getNickname();
+    }
 
     public void delete() {
         this.isDeleted = true;
