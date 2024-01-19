@@ -2,10 +2,7 @@ package com.studymate.backend.member.controller;
 
 import com.studymate.backend.config.security.jwt.JwtFilter;
 import com.studymate.backend.config.security.jwt.TokenProvider;
-import com.studymate.backend.member.dto.MemberLoginRequest;
-import com.studymate.backend.member.dto.MemberRequest;
-import com.studymate.backend.member.dto.MemberResponse;
-import com.studymate.backend.member.dto.TokenDto;
+import com.studymate.backend.member.dto.*;
 import com.studymate.backend.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -58,7 +55,9 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getMyMemberWithAuthorities());
     }
 
-//    @PutMapping("/user")
-//    @PreAuthorize("hasAnyRole('USER')")
-//    public ResponseEntity<MemberResponse>
+    @PutMapping("/user")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<MemberResponse> update(@Valid @RequestBody MemberUpdateRequest request) {
+        return ResponseEntity.ok(memberService.update(request));
+    }
 }
