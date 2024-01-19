@@ -8,6 +8,7 @@ import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.dto.MemberRequest;
 import com.studymate.backend.member.dto.MemberResponse;
+import com.studymate.backend.member.dto.MemberUpdateRequest;
 import com.studymate.backend.member.exception.DuplicateMemberException;
 import com.studymate.backend.member.exception.NotFoundMemberException;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,19 @@ public class MemberService {
                         .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
                         .orElseThrow(() -> new NotFoundMemberException("Member not found"))
         );
+    }
+
+    @Transactional
+    public MemberResponse update(MemberUpdateRequest request) {
+
+        Member member = SecurityUtil.getCurrentUsername()
+                .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+
+        member.update(request);
+
+        return memberMapper.toResponse(member);
+
+        // TODO 프로필 이미지 변경 구현
     }
 }
