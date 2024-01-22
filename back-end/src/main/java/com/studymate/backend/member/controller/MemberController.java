@@ -26,7 +26,6 @@ public class MemberController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final MemberService memberService;
-
     @PostMapping("/sign-in")
     public ResponseEntity<MemberResponse> signIn(@Valid @RequestBody MemberRequest request) {
         return ResponseEntity.ok(memberService.signup(request));
@@ -59,5 +58,11 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<MemberResponse> update(@Valid @RequestBody MemberUpdateRequest request) {
         return ResponseEntity.ok(memberService.update(request));
+    }
+
+    @DeleteMapping("/user")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<?> delete() {
+        return ResponseEntity.ok(memberService.delete());
     }
 }
