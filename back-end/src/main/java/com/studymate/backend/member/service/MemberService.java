@@ -32,7 +32,7 @@ public class MemberService {
         Member member = memberMapper.toEntity(request);
 
         ProfileImg image = ProfileImg.builder()
-                .url("profileImages/anonymous.png")
+                .name("프로필 사진이 없습니다.")
                 .member(member)
                 .build();
 
@@ -60,7 +60,16 @@ public class MemberService {
         member.update(request);
 
         return memberMapper.toResponse(member);
+    }
 
-        // TODO 프로필 이미지 변경 구현
+    @Transactional
+    public String delete() {
+
+        Member member = SecurityUtil.getCurrentUsername()
+                .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+
+        memberRepository.delete(member);
+        return "정상적으로 탈퇴되었습니다.";
     }
 }
