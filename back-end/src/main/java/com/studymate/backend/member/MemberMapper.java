@@ -47,14 +47,14 @@ public class MemberMapper {
         if (member == null) return null;
 
         ProfileImg image = profileImgRepository.findByMember(member);
-        String url = image.getUrl();
+        String imageName = image.getName();
 
         return MemberResponse.builder()
                 .email(member.getEmail())
                 .part(member.getPart())
                 .nickname(member.getNickname())
                 .interests(member.getInterests())
-                .imageUrl(url)
+                .imageUrl(imageName)
                 .name(member.getName())
                 .authoritiesDtoSet(member.getAuthorities().stream()
                         .map(authority -> Authority.builder().authorityName(authority.getAuthorityName()).build())
