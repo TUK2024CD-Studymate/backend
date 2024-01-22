@@ -28,8 +28,10 @@ public class ProfileImg extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private Member member;
 
-    public void updateUrl(String url) {
-        this.url = url;
+    public void upload(String name, String type, byte[] imageData){
+        this.name = name;
+        this.type = type;
+        this.imageData = imageData;
     }
 }
 
