@@ -2,8 +2,10 @@ package com.studymate.backend.member.domain;
 
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.global.BaseTimeEntity;
+import com.studymate.backend.member.dto.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE member SET is_deleted = true WHERE user_id =?")
 public class Member extends BaseTimeEntity{
 
     @Id
@@ -41,7 +44,10 @@ public class Member extends BaseTimeEntity{
     @ManyToMany
     private Set<Authority> authorities;
 
-    public void delete() {
-        this.isDeleted = true;
+    public void update(MemberUpdateRequest request) {
+        this.name = request.getName();
+        this.part = request.getPart();
+        this.interests = request.getInterests();
+        this.nickname = request.getNickname();
     }
 }
