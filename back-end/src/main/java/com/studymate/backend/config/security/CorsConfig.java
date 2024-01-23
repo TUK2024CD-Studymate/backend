@@ -19,7 +19,6 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Collections.singletonList("*"));
-
         source.registerCorsConfiguration("/api/**", config);
         return new CorsFilter(source);
     }
