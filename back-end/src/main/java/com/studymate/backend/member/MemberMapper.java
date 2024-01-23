@@ -56,9 +56,6 @@ public class MemberMapper {
                 .interests(member.getInterests())
                 .imageUrl(imageName)
                 .name(member.getName())
-                .authoritiesDtoSet(member.getAuthorities().stream()
-                        .map(authority -> Authority.builder().authorityName(authority.getAuthorityName()).build())
-                        .collect(Collectors.toSet()))
                 .build();
     }
 
