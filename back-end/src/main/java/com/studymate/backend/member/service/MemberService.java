@@ -24,7 +24,7 @@ public class MemberService {
     private final ProfileImgRepository profileImgRepository;
 
     @Transactional
-    public MemberResponse signup(MemberRequest request) {
+    public String signup(MemberRequest request) {
         if (memberRepository.findOneWithAuthoritiesByEmail(request.getEmail()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 회원입니다.");
         }
@@ -37,8 +37,9 @@ public class MemberService {
                 .build();
 
         profileImgRepository.save(image);
+        memberRepository.save(member);
 
-        return memberMapper.toResponse(memberRepository.save(member));
+        return "회원가입이 완료되었습니다.";
     }
 
     @Transactional(readOnly = true)
