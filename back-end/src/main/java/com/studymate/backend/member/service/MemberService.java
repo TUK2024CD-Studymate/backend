@@ -51,6 +51,14 @@ public class MemberService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Member getMyMemberEntity() {
+        return SecurityUtil.getCurrentUsername()
+                .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+    }
+
+
     @Transactional
     public MemberResponse update(MemberUpdateRequest request) {
 
