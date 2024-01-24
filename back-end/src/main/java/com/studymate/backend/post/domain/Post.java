@@ -33,4 +33,8 @@ public class Post extends BaseTimeEntity {
 
     private Boolean isDeleted;
 
+    public void update(String content){
+        this.content = content;
+    }
+
 }
