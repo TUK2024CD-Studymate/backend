@@ -12,17 +12,17 @@ import lombok.Setter;
 public class PostRequestDto {
     private String title;
     private String content;
-    private Long memberId;
     private String category;
+    private Member member;
 
-    public PostRequestDto(String title, String content, Long memberId, String category){
+    public PostRequestDto(String title, String content, Member member, String category){
         this.title = title;
         this.content = content;
-        this.memberId = memberId;
+        this.member = member;
         this.category = category;
     }
 
-    public Post toEntity(Member member){
+    public Post toEntity(){
         return Post.builder()
                 .title(title)
                 .content(content)
@@ -30,4 +30,5 @@ public class PostRequestDto {
                 .category(category)
                 .build();
     }
+
 }
