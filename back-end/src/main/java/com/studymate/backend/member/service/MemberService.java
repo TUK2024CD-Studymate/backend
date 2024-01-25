@@ -73,4 +73,11 @@ public class MemberService {
         memberRepository.delete(member);
         return "정상적으로 탈퇴되었습니다.";
     }
+
+    public Member getMember() {
+        Member member = SecurityUtil.getCurrentUsername().flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        return member;
+    }
 }
