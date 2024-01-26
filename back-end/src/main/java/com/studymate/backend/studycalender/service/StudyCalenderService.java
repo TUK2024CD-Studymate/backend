@@ -7,6 +7,7 @@ import com.studymate.backend.studycalender.StudyCalenderRepository;
 import com.studymate.backend.studycalender.StudyCalenderValidator.StudyCalenderValidator;
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
+import com.studymate.backend.studycalender.dto.CalenderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +39,19 @@ public class StudyCalenderService {
         studyCalenderRepository.save(calender);
 
         return "스터디기록이 생성되었습니다.";
+    }
+
+    public CalenderResponse findOne(Long id) {
+
+        Member member = memberService.getMember();
+
+        StudyCalender calender = studyCalenderRepository.findByMemberAndId(member, id);
+
+        if (calender == null) {
+            throw new RuntimeException("기록을 찾지 못했습니다.");
+        }
+        CalenderResponse calenderResponse = studyCalenderMapper.toResponse(calender);
+
+        return calenderResponse;
     }
 }
