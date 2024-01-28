@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Entity
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
 public class Post extends BaseTimeEntity {
@@ -18,22 +18,21 @@ public class Post extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false, updatable = false)
+    @JoinColumn(name="user_id",updatable = false)
     private Member member;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String title;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
     private String content;
 
-    @Column(nullable = false)
     private String category;
 
-    private Boolean isDeleted;
-
-    public void update(String content){
+    public void update(String title, String content, String category){
+        this.title = title;
         this.content = content;
+        this.category = category;
     }
 
 }
