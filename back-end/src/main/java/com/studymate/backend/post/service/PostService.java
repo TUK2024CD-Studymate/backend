@@ -1,75 +1,68 @@
 package com.studymate.backend.post.service;
 
+import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
-import com.studymate.backend.member.service.MemberService;
+
+import com.studymate.backend.post.PostMapper;
 import com.studymate.backend.post.domain.Post;
 import com.studymate.backend.post.dto.PostRequestDto;
 import com.studymate.backend.post.dto.PostResponseDto;
+import com.studymate.backend.post.dto.PostUpdateRequestDto;
 import com.studymate.backend.post.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PostService {
     private final PostRepository postRepository;
-    private final MemberService memberService;
+    private final PostMapper postMapper;
+    private final MemberRepository memberRepository;
 
     // 게시글 생성
     @Transactional
-    public Post save(PostRequestDto requestDto){
-        return postRepository.save(requestDto.toEntity());
+    public PostResponseDto save(PostRequestDto requestDto){
+        Member member = memberRepository.findById(requestDto.getUser_id())
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        Post post = postMapper.toEntity(requestDto, member);
+        Post savedPost = postRepository.save(post);
+        return postMapper.toResponse(savedPost);
     }
 
     // 게시글 리스트
-    public List<PostResponseDto> list(Member member, String nickname) {
+    public List<PostResponseDto> list() {
         List<Post> posts = postRepository.findAll();
-        List<PostResponseDto> postList = new ArrayList<>();
-
-        for (Post post : posts) {
-            PostResponseDto postResponseDto = new PostResponseDto(post);
-            postList.add(postResponseDto);
-        }
-        return postList;
+        return posts.stream()
+                .map(postMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     // 게시글 조회
-    public PostResponseDto find(Member member, Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-        PostResponseDto postResponseDto = new PostResponseDto(post);
-        return new PostResponseDto(post);
+    public PostResponseDto find(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        return postMapper.toResponse(post);
     }
 
     // 게시글 수정
     @Transactional
-    public String update(Long id, PostRequestDto requestDto) {
-        String message = "fail";
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-        Member currentMember = memberService.getMyMemberEntity();
-
-        if(post.getMember().getId().equals(currentMember.getId())){
-            post.update(requestDto.getContent());
-            message = "success";
-        }
-        return message;
-
+    public String updatePost(Long id, PostUpdateRequestDto requestDto) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        post.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getCategory());
+        return "success";
     }
 
-
+    // 게시글 삭제
     @Transactional
-    public String delete(Long id, Member member){
-        String message = "fail";
-        Post post = postRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("해당 게시글이 없습니다."));
-        if (post.getMember().getId().equals(member.getId())){ // 작성자만 삭제 가능
-            postRepository.delete(post);
-            message = "success";
-        }
-        return message;
+    public String deletePost(Long id){
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        postRepository.delete(post);
+        return "success";
     }
-
 }
