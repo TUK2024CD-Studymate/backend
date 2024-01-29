@@ -3,10 +3,13 @@ package com.studymate.backend.member.domain;
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.global.BaseTimeEntity;
 import com.studymate.backend.member.dto.MemberUpdateRequest;
+import com.studymate.backend.studycalender.domain.StudyCalender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -43,6 +46,9 @@ public class Member extends BaseTimeEntity{
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     @ManyToMany
     private Set<Authority> authorities;
+
+    @OneToMany(mappedBy = "member")
+    private List<StudyCalender> studyCalenders = new ArrayList<>();
 
     public void update(MemberUpdateRequest request) {
         this.name = request.getName();
