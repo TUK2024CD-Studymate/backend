@@ -2,10 +2,12 @@ package com.studymate.backend.studycalender.controller;
 
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
 import com.studymate.backend.studycalender.dto.CalenderResponse;
+import com.studymate.backend.studycalender.dto.CalenderUpdateRequest;
 import com.studymate.backend.studycalender.service.StudyCalenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "StudyCalender", description = "StudyCalender API")
 public class StudyCalenderController {
 
     private final StudyCalenderService studyCalenderService;
@@ -30,5 +33,20 @@ public class StudyCalenderController {
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<CalenderResponse> findCalender(@PathVariable("calender_id") Long id) {
         return ResponseEntity.ok(studyCalenderService.findOne(id));
+    }
+
+    @PutMapping("/calender/{calender_id}")
+    @Operation(summary = "update calender", description = "회원이 작성했던 스터디 기록을 수정한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<CalenderResponse> updateCalender(@PathVariable("calender_id") Long id,
+                                                           @Valid @RequestBody CalenderUpdateRequest request) {
+        return ResponseEntity.ok(studyCalenderService.update(id, request));
+    }
+
+    @DeleteMapping("/calender/{calender_id}")
+    @Operation(summary = "delete calender", description = "회원이 작성했던 스터디 기록을 삭제한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<String> deleteCalender(@PathVariable("calender_id") Long id) {
+        return ResponseEntity.ok(studyCalenderService.delete(id));
     }
 }

@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,4 +37,12 @@ public class StudyCalender extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
+
+    public void update(String content, Interests studyClass,
+                       LocalDateTime startTime, LocalDateTime endTime) {
+        this.content = content;
+        this.studyClass = studyClass;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 }

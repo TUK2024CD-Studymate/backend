@@ -8,6 +8,7 @@ import com.studymate.backend.studycalender.StudyCalenderValidator.StudyCalenderV
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
 import com.studymate.backend.studycalender.dto.CalenderResponse;
+import com.studymate.backend.studycalender.dto.CalenderUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,11 +48,37 @@ public class StudyCalenderService {
 
         StudyCalender calender = studyCalenderRepository.findByMemberAndId(member, id);
 
-        if (calender == null) {
-            throw new RuntimeException("기록을 찾지 못했습니다.");
-        }
-        CalenderResponse calenderResponse = studyCalenderMapper.toResponse(calender);
+        validator.calenderExistValidator(calender);
 
-        return calenderResponse;
+        return studyCalenderMapper.toResponse(calender);
+    }
+
+    @Transactional
+    public CalenderResponse update(Long id, CalenderUpdateRequest request) {
+
+        LocalDateTime startTime = request.getStartTime();
+        LocalDateTime endTime = request.getEndTime();
+
+        validator.timeValidator(startTime, endTime);
+
+        Member member = memberService.getMember();
+        StudyCalender calender = studyCalenderRepository.findByMemberAndId(member, id);
+
+        validator.calenderExistValidator(calender);
+
+        calender.update(request.getContent(), request.getInterests(),
+                request.getStartTime(), request.getEndTime());
+
+        return studyCalenderMapper.toResponse(calender);
+    }
+
+    public String delete(Long id) {
+        Member member = memberService.getMember();
+        StudyCalender calender = studyCalenderRepository.findByMemberAndId(member, id);
+
+        validator.calenderExistValidator(calender);
+
+        studyCalenderRepository.delete(calender);
+        return "정상적으로 삭제되었습니다.";
     }
 }
