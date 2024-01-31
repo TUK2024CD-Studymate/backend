@@ -4,11 +4,9 @@ import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.post.domain.Post;
 import com.studymate.backend.post.dto.PostRequestDto;
 import com.studymate.backend.post.dto.PostResponseDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class PostMapper {
 
     public Post toEntity(PostRequestDto request, Member member) {
