@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,19 +19,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Post", description = "Post API")
+@RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
 
     @PostMapping("/posts")
     @Operation(summary = "post create", description = "게시글 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
-    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto requestDto) {
+    public ResponseEntity<String> createPost(@Valid @RequestBody PostRequestDto requestDto) {
         PostResponseDto postResponseDto = postService.save(requestDto);
-        return ResponseEntity.status(201).body(postResponseDto);
+        return ResponseEntity.ok("게시글이 생성되었습니다.");
     }
 
     @GetMapping("/posts")
@@ -51,16 +50,16 @@ public class PostController {
     @PutMapping("/posts/{id}")
     @Operation(summary = "post update", description = "게시글 수정")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
-        postService.updatePost(id, requestDto);
+    public ResponseEntity<String> updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto, @AuthenticationPrincipal(expression = "username") String userEmail) {
+        postService.updatePost(id, requestDto, userEmail);
         return ResponseEntity.ok("업데이트 되었습니다.");
     }
 
     @DeleteMapping("/posts/{id}")
     @Operation(summary = "post delete", description = "게시글 삭제")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    public ResponseEntity<String> deletePost(@PathVariable Long id, @AuthenticationPrincipal String userEmail) {
+        postService.deletePost(id, userEmail);
         return ResponseEntity.ok("삭제되었습니다.");
     }
 }
