@@ -2,7 +2,6 @@ package com.studymate.backend.post.service;
 
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
-
 import com.studymate.backend.post.PostMapper;
 import com.studymate.backend.post.domain.Post;
 import com.studymate.backend.post.dto.PostRequestDto;
@@ -50,18 +49,32 @@ public class PostService {
 
     // 게시글 수정
     @Transactional
-    public String updatePost(Long id, PostUpdateRequestDto requestDto) {
+    public String updatePost(Long id, PostUpdateRequestDto requestDto, String userEmail) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+
+//        System.out.println("User Email: " + userEmail);
+//        System.out.println("Post Owner Email: " + post.getMember().getEmail());
+//
+//        // 게시글의 사용자 이메일과 현재 인증된 사용자의 이메일을 비교
+//        if (!post.getMember().getEmail().equals(userEmail)) {
+//            throw new IllegalArgumentException("본인의 게시글만 수정할 수 있습니다.");
+//        }
         post.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getCategory());
         return "success";
     }
 
     // 게시글 삭제
     @Transactional
-    public String deletePost(Long id){
+    public String deletePost(Long id, String userEmail){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+
+//        // 게시글의 사용자 이메일과 현재 인증된 사용자의 이메일을 비교
+//        if (!post.getMember().getEmail().equals(userEmail)) {
+//            throw new IllegalArgumentException("본인의 게시글만 삭제할 수 있습니다.");
+//        }
+
         postRepository.delete(post);
         return "success";
     }
