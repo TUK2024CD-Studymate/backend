@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIA_DB_PASSWORD}
+      MYSQL_DATABASE: ${MARIA_DB}
+      MYSQL_USER: ${MARIA_DB_USER}
+      MYSQL_PASSWORD: ${MARIA_DB_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mariadb
+    networks:
+      - study_mate
+
+  back-end:
+    build: .
+    container_name: study-mate
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      MARIA_DB_USERNAME: ${MARIA_DB_USER}
+      MARIA_DB_PASSWORD: ${MARIA_DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    networks:
+      - study_mate
+
+volumes:
+  mariadb_data:
+
+networks:
+  study_mate:
+    driver: bridge
+
