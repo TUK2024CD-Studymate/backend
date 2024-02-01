@@ -6,10 +6,10 @@ services:
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MARIA_DB_PASSWORD}
-      MYSQL_DATABASE: ${MARIA_DB}
-      MYSQL_USER: ${MARIA_DB_USER}
-      MYSQL_PASSWORD: ${MARIA_DB_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -25,8 +25,8 @@ services:
       - db
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      MARIA_DB_USERNAME: ${MARIA_DB_USER}
-      MARIA_DB_PASSWORD: ${MARIA_DB_PASSWORD}
+      MARIA_DB_USER: ${MARIADB_USER}
+      MARIA_DB_PASSWORD: ${MARIADB_PASSWORD}
     ports:
       - "8080:8080"
     volumes:
