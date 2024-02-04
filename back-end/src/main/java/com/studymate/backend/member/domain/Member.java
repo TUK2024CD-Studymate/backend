@@ -48,7 +48,7 @@ public class Member extends BaseTimeEntity{
     private Set<Authority> authorities;
 
     @OneToMany(mappedBy = "member")
-    private List<StudyCalender> studyCalenders = new ArrayList<>();
+    private final List<StudyCalender> studyCalenders = new ArrayList<>();
 
     public void update(MemberUpdateRequest request) {
         this.name = request.getName();
