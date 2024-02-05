@@ -14,4 +14,5 @@ public enum Interests {
     Interests(String korean) {
         this.korean = korean;
     }
+
 }
