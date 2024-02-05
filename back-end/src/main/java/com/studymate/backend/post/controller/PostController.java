@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +26,9 @@ public class PostController {
     @PostMapping("/posts")
     @Operation(summary = "post create", description = "게시글 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
-    public ResponseEntity<String> createPost(@Valid @RequestBody PostRequestDto requestDto) {
+    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto requestDto) {
         PostResponseDto postResponseDto = postService.save(requestDto);
-        return ResponseEntity.ok("게시글이 생성되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
     }
 
     @GetMapping("/posts")
