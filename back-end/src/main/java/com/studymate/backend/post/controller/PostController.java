@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,17 +48,23 @@ public class PostController {
 
     @PutMapping("/posts/{id}")
     @Operation(summary = "post update", description = "게시글 수정")
-    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto, @AuthenticationPrincipal(expression = "username") String userEmail) {
-        postService.updatePost(id, requestDto, userEmail);
-        return ResponseEntity.ok("업데이트 되었습니다.");
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
+    })
+    public ResponseEntity<String> updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
+        String result = postService.updatePost(id, requestDto);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/posts/{id}")
     @Operation(summary = "post delete", description = "게시글 삭제")
-    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> deletePost(@PathVariable Long id, @AuthenticationPrincipal String userEmail) {
-        postService.deletePost(id, userEmail);
-        return ResponseEntity.ok("삭제되었습니다.");
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
+    })
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        String result = postService.deletePost(id);
+        return ResponseEntity.ok(result);
     }
 }
