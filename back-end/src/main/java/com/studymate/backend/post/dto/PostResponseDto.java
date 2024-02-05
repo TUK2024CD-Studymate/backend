@@ -1,5 +1,7 @@
 package com.studymate.backend.post.dto;
 
+import com.studymate.backend.member.domain.Category;
+import com.studymate.backend.member.domain.Interests;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,10 @@ public class PostResponseDto {
 
     private String nickname;
 
-    private String category;
+    private Category category;
+
+    private Interests interests;
+
+    private Boolean recruitmentStatus;
 
 }
