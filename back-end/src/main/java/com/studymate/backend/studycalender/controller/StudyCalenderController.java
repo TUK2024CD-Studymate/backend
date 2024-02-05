@@ -1,6 +1,7 @@
 package com.studymate.backend.studycalender.controller;
 
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
+import com.studymate.backend.studycalender.dto.CalenderListResponse;
 import com.studymate.backend.studycalender.dto.CalenderResponse;
 import com.studymate.backend.studycalender.dto.CalenderUpdateRequest;
 import com.studymate.backend.studycalender.service.StudyCalenderService;
@@ -48,5 +49,12 @@ public class StudyCalenderController {
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<String> deleteCalender(@PathVariable("calender_id") Long id) {
         return ResponseEntity.ok(studyCalenderService.delete(id));
+    }
+
+    @GetMapping("/calender")
+    @Operation(summary = "get members calender", description = "회원이 작성한 스터디 기록을 전체 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<CalenderListResponse> findAllCalender() {
+        return ResponseEntity.ok(studyCalenderService.findAll());
     }
 }
