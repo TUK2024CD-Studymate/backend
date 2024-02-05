@@ -67,4 +67,11 @@ public class PostService {
         return "success";
     }
 
+    public List<PostResponseDto> searchByKeyword(String keyword) {
+        List<Post> posts = postRepository.findByKeyword(keyword);
+        return posts.stream()
+                .map(postMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
 }
