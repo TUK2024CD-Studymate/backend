@@ -4,8 +4,6 @@ import com.studymate.backend.config.security.jwt.JwtAccessDeniedHandler;
 import com.studymate.backend.config.security.jwt.JwtAuthenticationEntryPoint;
 import com.studymate.backend.config.security.jwt.JwtSecurityConfig;
 import com.studymate.backend.config.security.jwt.TokenProvider;
-
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -58,7 +56,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/api/signIn", "api/login").permitAll()
                         .requestMatchers( "/","/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(PathRequest.toH2Console()).permitAll()
+//                        .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated()
                 )
 
