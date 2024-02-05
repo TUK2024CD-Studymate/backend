@@ -1,6 +1,8 @@
 package com.studymate.backend.post.domain;
 
 import com.studymate.backend.global.BaseTimeEntity;
+import com.studymate.backend.member.domain.Category;
+import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,12 +29,22 @@ public class Post extends BaseTimeEntity {
     @Column(length = 500)
     private String content;
 
-    private String category;
+    private Category category;
 
-    public void update(String title, String content, String category){
+    @Enumerated(EnumType.STRING)
+    private Interests interests;
+
+    private Boolean recruitmentStatus;
+
+
+    public void update(String title, String content, Category category, Interests interests, Boolean recruitmentStatus){
         this.title = title;
         this.content = content;
         this.category = category;
+        this.interests = interests;
+        if (category == Category.STUDY) {
+            this.recruitmentStatus = recruitmentStatus;
+        }
     }
 
 }
