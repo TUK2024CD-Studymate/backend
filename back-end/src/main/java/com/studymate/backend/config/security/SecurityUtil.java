@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class SecurityUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
@@ -17,7 +19,7 @@ public class SecurityUtil {
     public static Optional<String> getCurrentUsername() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             logger.debug("Security Context에 인증 정보가 없습니다.");
             return Optional.empty();
         }
@@ -30,6 +32,7 @@ public class SecurityUtil {
             email = (String) authentication.getPrincipal();
         }
 
+        String username = authentication.getName();
         return Optional.ofNullable(email);
     }
 }
