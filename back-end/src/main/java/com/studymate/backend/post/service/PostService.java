@@ -1,7 +1,7 @@
 package com.studymate.backend.post.service;
 
-import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.post.PostMapper;
 import com.studymate.backend.post.domain.Post;
 import com.studymate.backend.post.dto.PostRequestDto;
@@ -20,13 +20,14 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final ServiceValidator serviceValidator;
 
     // 게시글 생성
     @Transactional
-    public PostResponseDto save(PostRequestDto requestDto){
-        Member member = memberRepository.findById(requestDto.getUser_id())
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+    public PostResponseDto save(PostRequestDto requestDto) {
+        Member member = memberService.getMember(); // 현재 인증된 회원 확인
+
         Post post = postMapper.toEntity(requestDto, member);
         Post savedPost = postRepository.save(post);
         return postMapper.toResponse(savedPost);
@@ -49,32 +50,19 @@ public class PostService {
 
     // 게시글 수정
     @Transactional
-    public String updatePost(Long id, PostUpdateRequestDto requestDto, String userEmail) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+    public String updatePost(Long id, PostUpdateRequestDto requestDto) {
+        Member member = memberService.getMember(); // 현재 인증된 회원 확인
+        Post post = serviceValidator.validatePostOwnership(id, member); // 게시글 소유권 검증
 
-//        System.out.println("User Email: " + userEmail);
-//        System.out.println("Post Owner Email: " + post.getMember().getEmail());
-//
-//        // 게시글의 사용자 이메일과 현재 인증된 사용자의 이메일을 비교
-//        if (!post.getMember().getEmail().equals(userEmail)) {
-//            throw new IllegalArgumentException("본인의 게시글만 수정할 수 있습니다.");
-//        }
-        post.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getCategory());
+        post.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getCategory(), requestDto.getInterests(), requestDto.getRecruitmentStatus());
         return "success";
     }
 
     // 게시글 삭제
     @Transactional
-    public String deletePost(Long id, String userEmail){
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-
-//        // 게시글의 사용자 이메일과 현재 인증된 사용자의 이메일을 비교
-//        if (!post.getMember().getEmail().equals(userEmail)) {
-//            throw new IllegalArgumentException("본인의 게시글만 삭제할 수 있습니다.");
-//        }
-
+    public String deletePost(Long id){
+        Member member = memberService.getMember();
+        Post post = serviceValidator.validatePostOwnership(id, member);
         postRepository.delete(post);
         return "success";
     }
