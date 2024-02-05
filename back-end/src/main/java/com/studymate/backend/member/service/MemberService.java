@@ -11,6 +11,7 @@ import com.studymate.backend.member.dto.MemberResponse;
 import com.studymate.backend.member.dto.MemberUpdateRequest;
 import com.studymate.backend.member.exception.DuplicateMemberException;
 import com.studymate.backend.member.exception.NotFoundMemberException;
+import com.studymate.backend.post.service.ServiceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final ProfileImgRepository profileImgRepository;
+    private ServiceValidator serviceValidator;
 
     @Transactional
     public String signup(MemberRequest request) {
@@ -74,4 +76,12 @@ public class MemberService {
         memberRepository.delete(member);
         return "정상적으로 탈퇴되었습니다.";
     }
+
+    public Member getMember() {
+        Member member = SecurityUtil.getCurrentUsername().flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        return member;
+    }
+
 }
