@@ -68,4 +68,12 @@ public class PostController {
         String result = postService.deletePost(id);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/posts/search")
+    @Operation(summary = "Search posts by keyword", description = "키워드로 게시글 검색")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<PostResponseDto>> searchPostsByKeyword(@RequestParam String keyword) {
+        List<PostResponseDto> postResponseDtoList = postService.searchByKeyword(keyword);
+        return ResponseEntity.ok(postResponseDtoList);
+    }
 }
