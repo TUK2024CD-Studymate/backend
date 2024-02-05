@@ -7,6 +7,7 @@ import com.studymate.backend.studycalender.StudyCalenderRepository;
 import com.studymate.backend.studycalender.StudyCalenderValidator.StudyCalenderValidator;
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
+import com.studymate.backend.studycalender.dto.CalenderListResponse;
 import com.studymate.backend.studycalender.dto.CalenderResponse;
 import com.studymate.backend.studycalender.dto.CalenderUpdateRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -80,5 +82,12 @@ public class StudyCalenderService {
 
         studyCalenderRepository.delete(calender);
         return "정상적으로 삭제되었습니다.";
+    }
+
+    public CalenderListResponse findAll() {
+        Member member = memberService.getMember();
+        List<StudyCalender> calenderList = studyCalenderRepository.findAllByMember(member);
+
+        return studyCalenderMapper.toListResponse(calenderList);
     }
 }
