@@ -36,7 +36,4 @@ public class PostRequestDto {
     @Schema(description = "스터디 모집 여부 (스터디 카테고리인 경우만 적용)", nullable = true, example = "true")
     private Boolean recruitmentStatus;
 
-    @NotNull
-    @Schema(description = "회원 ID", nullable = false, example = "1")
-    private Long user_id;
 }
