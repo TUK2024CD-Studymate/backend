@@ -28,7 +28,7 @@ public class StudyCalenderService {
     private final StudyCalenderValidator validator;
 
     @Transactional
-    public String createPost(CalenderCreateRequest request) {
+    public Long createPost(CalenderCreateRequest request) {
 
         Member member = memberService.getMember();
 
@@ -41,7 +41,7 @@ public class StudyCalenderService {
 
         studyCalenderRepository.save(calender);
 
-        return "스터디기록이 생성되었습니다.";
+        return calender.getId();
     }
 
     public CalenderResponse findOne(Long id) {
