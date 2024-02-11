@@ -54,20 +54,21 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/api/signIn", "api/login").permitAll()
-                        .requestMatchers( "/","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/api/signIn", "api/login").permitAll()
+                                .requestMatchers("/api/meeting/**").permitAll()
+                                .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 //                        .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
-
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .headers(headers ->
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                        )
+                )
 
-                .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
+                .with(new JwtSecurityConfig(tokenProvider), customizer -> {
+                });
         return http.build();
     }
 }
