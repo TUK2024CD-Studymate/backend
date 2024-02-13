@@ -64,7 +64,7 @@ public class ZoomController {
         return ResponseEntity.ok().body(list);
     }
 
-    @GetMapping("api/meeting/create")
+    @GetMapping("/api/meeting/create")
     public ResponseEntity<?> createMeeting() throws IOException {
 
         isExpired();
