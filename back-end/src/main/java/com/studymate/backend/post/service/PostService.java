@@ -74,4 +74,9 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public Post getPost(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+    }
+
 }
