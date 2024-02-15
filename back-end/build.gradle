@@ -29,6 +29,9 @@ jar {
 	}
 }
 
+springBoot {
+	mainClass = 'com.studymate.backend.BackEndApplication'
+}
 
 
 dependencies {
