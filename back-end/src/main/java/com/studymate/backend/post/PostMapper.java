@@ -33,7 +33,7 @@ public class PostMapper {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
-                .createdAt(post.getCreatedAt().toString()) // 날짜 포맷은 필요에 따라 변경
+                .createdAt(post.getCreatedAt()) // 날짜 포맷은 필요에 따라 변경
                 .interests(post.getInterests())
                 .recruitmentStatus(post.getRecruitmentStatus()) // 모집 여부 추가
                 .nickname(nickname)
