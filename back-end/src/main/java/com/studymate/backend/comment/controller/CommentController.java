@@ -1,12 +1,10 @@
 package com.studymate.backend.comment.controller;
 
-import com.studymate.backend.comment.dto.CommentRequestDto;
-import com.studymate.backend.comment.dto.CommentResponseDto;
+import com.studymate.backend.comment.dto.request.CommentRequest;
+import com.studymate.backend.comment.dto.response.CommentResponse;
 import com.studymate.backend.comment.service.CommentService;
-import com.studymate.backend.comment.service.CommentServiceValidator;
 import com.studymate.backend.post.domain.Post;
-import com.studymate.backend.post.service.PostService;
-import com.studymate.backend.post.service.ServiceValidator;
+import com.studymate.backend.post.repository.PostRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,25 +23,24 @@ import java.util.List;
 @Tag(name = "Comment", description = "Comment API")
 public class CommentController {
     private final CommentService commentService;
-    private final PostService postService;
-    private final ServiceValidator serviceValidator;
-    private final CommentServiceValidator commentServiceValidator;
+    private final PostRepository postRepository;
+
 
     @PostMapping("/posts/{post_id}/comments")
     @Operation(summary = "comment create", description = "댓글 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
-    public ResponseEntity<CommentResponseDto> createComment(@PathVariable("post_id") Long postId,
-                                                            @Valid @RequestBody CommentRequestDto requestDto){
-        Post post = postService.getPost(postId);
-        CommentResponseDto commentResponseDto = commentService.save(requestDto, post);
+    public ResponseEntity<CommentResponse> createComment(@PathVariable("post_id") Long id,
+                                                         @Valid @RequestBody CommentRequest requestDto){
+        Post post = postRepository.findById(id).orElseThrow(IllegalStateException::new);
+        CommentResponse commentResponseDto = commentService.save(requestDto, post);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDto);
     }
 
     @GetMapping("/posts/{post_id}/comments")
     @Operation(summary = "comments read", description = "해당 게시글의 댓글 읽기")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<List<CommentResponseDto>> getCommentsByPostId(@PathVariable("post_id") Long postId){
-        List<CommentResponseDto> comments = commentService.list(postId);
+    public ResponseEntity<List<CommentResponse>> getCommentsByPostId(@PathVariable("post_id") Long postId){
+        List<CommentResponse> comments = commentService.list(postId);
         return ResponseEntity.ok(comments);
     }
 
@@ -55,9 +52,8 @@ public class CommentController {
     })
     public ResponseEntity<String> updateComment(@PathVariable("post_id") Long postId,
                                                 @PathVariable("comment_id") Long commentId,
-                                                @Valid @RequestBody CommentRequestDto requestDto){
-        commentServiceValidator.validateCommentBelongsToPost(commentId, postId);
-        String result = commentService.updateComment(commentId, requestDto);
+                                                @Valid @RequestBody CommentRequest requestDto){
+        String result = commentService.updateComment(postId, commentId, requestDto);
         return ResponseEntity.ok(result);
     }
 
@@ -69,8 +65,7 @@ public class CommentController {
     })
     public ResponseEntity<String> deletePost(@PathVariable("post_id") Long postId,
                                              @PathVariable("comment_id") Long commentId){
-        commentServiceValidator.validateCommentBelongsToPost(commentId, postId);
-        String result = commentService.deleteComment(commentId);
+        String result = commentService.deleteComment(postId, commentId);
         return ResponseEntity.ok(result);
     }
 }
