@@ -1,10 +1,13 @@
 package com.studymate.backend.comment.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.studymate.backend.comment.domain.Comment;
 import com.studymate.backend.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Builder
@@ -18,6 +21,9 @@ public class CommentResponse {
 
     private Long post_id;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt;
+
     public static CommentResponse toResponse(Comment comment){
         if(comment == null) return null;
 
@@ -29,6 +35,7 @@ public class CommentResponse {
                 .content(comment.getContent())
                 .nickname(nickname)
                 .post_id(comment.getPost().getId())
+                .createdAt(comment.getCreatedAt())
                 .build();
     }
 }
