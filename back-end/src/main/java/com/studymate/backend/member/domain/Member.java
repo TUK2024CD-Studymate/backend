@@ -24,20 +24,43 @@ public class Member extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-
-    @Column(unique = true)
+    @Column
     private String email;
+    @Column
     private String password;
+    @Column
+    private String blogUrl;
+    @Column
+    private int solved;
+    @Column
+    private int matchingCount;
+    @Column
+    private int reviewCount;
+    @Column
+    private int heart;
+    @Column
+    private String publicRelations;
+    @Column
+    private String job;
+    @Column
+    private int star;
+    @Column
+    private double starAverage;
+    @Column
     private String name;
     @Enumerated(value = EnumType.STRING)
+    @Column
     private Part part;
     @Enumerated(value = EnumType.STRING)
+    @Column
     private Interests interests;
     @Column(unique = true)
     private String nickname;
-    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
-    private ProfileImg profileUrl;
+//    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+//    private ProfileImg profileUrl;
+    @Column
     private Boolean isDeleted;
+    @Column
     private boolean activated;
 
     @JoinTable(
@@ -55,5 +78,27 @@ public class Member extends BaseTimeEntity{
         this.part = request.getPart();
         this.interests = request.getInterests();
         this.nickname = request.getNickname();
+        this.blogUrl = request.getBlogUrl();
+        this.publicRelations = request.getPublicRelations();
+        this.job = request.getJob();
+    }
+
+    public void updateSolved() {
+        this.solved++;
+    }
+
+    public void updateHeart() {
+        this.heart++;
+    }
+
+    public void updateReviewCount() {
+        this.reviewCount++;
+    }
+
+    public void updateMatchingCount() {
+        this.matchingCount++;
+    }
+    public void setStarAverage(int reviewCount) {
+        this.starAverage = (double) this.star / reviewCount;
     }
 }
