@@ -25,18 +25,18 @@ public class ProfileImgService {
     @Transactional
     public String upload(MultipartFile upload) throws IOException {
 
-        Member member = SecurityUtil.getCurrentUsername()
-                .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
-                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
-
-        ProfileImg image = profileImgRepository.findByMember(member);
-
-        image.upload(upload.getOriginalFilename(), upload.getContentType(), upload.getBytes());
-
-        if (image != null) {
-            log.info("imageDataName: {}", image.getName());
-            return "업로드 성공 : " + upload.getOriginalFilename();
-        }
+//        Member member = SecurityUtil.getCurrentUsername()
+//                .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
+//                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+//
+//        ProfileImg image = profileImgRepository.findByMember(member);
+//
+//        image.upload(upload.getOriginalFilename(), upload.getContentType(), upload.getBytes());
+//
+//        if (image != null) {
+//            log.info("imageDataName: {}", image.getName());
+//            return "업로드 성공 : " + upload.getOriginalFilename();
+//        }
 
         return null;
     }

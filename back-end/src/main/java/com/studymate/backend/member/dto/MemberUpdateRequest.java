@@ -29,4 +29,11 @@ public class MemberUpdateRequest {
     @NotBlank
     @Schema(description = "사용자가 바꿀 닉네임", nullable = false, example = "화난사람")
     private String nickname;
+    @Schema(description = "사용자의 블로그URL", nullable = true, example = "https://hothoony.tistory.com/890")
+    private String blogUrl;
+    @Schema(description = "사용자 PR요소", nullable = true, example = "한국공학대학교 SW공모전 대상경험, 해커톤 우수상")
+    private String publicRelations;
+    @NotBlank
+    @Schema(description = "사용자 직장", nullable = false, example = "KAKAO개발자")
+    private String job;
 }

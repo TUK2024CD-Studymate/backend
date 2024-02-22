@@ -11,10 +11,18 @@ import lombok.Getter;
 @Builder
 @Getter
 public class MemberResponse {
+    private Long id;
     private String name;
     private String nickname;
     private Part part;
     private String email;
     private Interests interests;
-    private String imageUrl;
+//    private String imageUrl;
+    private String blogUrl;
+    private String publicRelations;
+    private String job;
+    private int heart;
+    private double starAverage;
+    private int solved;
+    private int matchingCount;
 }
