@@ -37,6 +37,14 @@ public class MemberMapper {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .activated(true)
                 .isDeleted(false)
+                .job(request.getJob())
+                .blogUrl(request.getBlogUrl())
+                .heart(0)
+                .star(0)
+                .solved(0)
+                .starAverage(0.0)
+                .matchingCount(0)
+                .publicRelations(request.getPublicRelations())
                 .authorities(Collections.singleton(authority))
                 .build();
 
@@ -44,18 +52,27 @@ public class MemberMapper {
     }
 
     public MemberResponse toResponse(Member member) {
+
         if (member == null) return null;
 
-        ProfileImg image = profileImgRepository.findByMember(member);
-        String imageName = image.getName();
+//        ProfileImg image = profileImgRepository.findByMember(member);
+//        String imageName = image.getName();
 
         return MemberResponse.builder()
+                .id(member.getId())
                 .email(member.getEmail())
                 .part(member.getPart())
                 .nickname(member.getNickname())
                 .interests(member.getInterests())
-                .imageUrl(imageName)
+//                .imageUrl(imageName)
                 .name(member.getName())
+                .blogUrl(member.getBlogUrl())
+                .publicRelations(member.getPublicRelations())
+                .job(member.getJob())
+                .heart(member.getHeart())
+                .starAverage(member.getStarAverage())
+                .solved(member.getSolved())
+                .matchingCount(member.getMatchingCount())
                 .build();
     }
 
