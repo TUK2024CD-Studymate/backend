@@ -37,4 +37,11 @@ public class MemberRequest {
     @NotBlank
     @Schema(description = "사용자 닉네임", nullable = false, example = "정환코딩")
     private String nickname;
+    @Schema(description = "사용자의 블로그URL", nullable = true, example = "https://dnfjrdl.tistory.com/category")
+    private String blogUrl;
+    @Schema(description = "사용자 PR요소", nullable = true, example = "한국공학대학교 SW공모전 대상경험")
+    private String publicRelations;
+    @NotBlank
+    @Schema(description = "사용자 직장", nullable = false, example = "Kaist")
+    private String job;
 }
