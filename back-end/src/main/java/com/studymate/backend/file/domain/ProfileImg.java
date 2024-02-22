@@ -24,9 +24,9 @@ public class ProfileImg extends BaseTimeEntity {
     @Column(name = "imagedata", length = 1000)
     private byte[] imageData;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Member member;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    private Member member;
 
     public void upload(String name, String type, byte[] imageData){
         this.name = name;
