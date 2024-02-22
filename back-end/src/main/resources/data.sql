@@ -1,9 +1,6 @@
 INSERT IGNORE INTO authority (authority_name) VALUES ('ROLE_USER');
 INSERT IGNORE INTO authority (authority_name) VALUES ('ROLE_ADMIN');
 
-insert into authority (authority_name) values ('ROLE_ADMIN');
-insert into authority (authority_name) values ('ROLE_USER');
-
 INSERT INTO mariadb.member (activated, heart, is_deleted, matching_count, review_count, solved, star, star_average, created_at, updated_at, user_id, blog_url, email, job, name, nickname, password, public_relations, interests, part)
 VALUES (true, 2, false, 13, 13, 10, 23, 2.1, '2024-02-21 15:50:38.000000', '2024-02-21 15:50:40.000000', 1, 'www.asdf.com', 'wjddngur@naver.com', '무직', '우혁', '우혁정', 'asdf1020', 'SW공모전 13회 대상', 'PROGRAMMING', 'MENTOR');
 
