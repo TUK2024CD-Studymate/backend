@@ -5,7 +5,10 @@ import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.member.MemberRepository;
+import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.member.domain.Part;
+import com.studymate.backend.member.dto.MemberListResponse;
 import com.studymate.backend.member.dto.MemberRequest;
 import com.studymate.backend.member.dto.MemberResponse;
 import com.studymate.backend.member.dto.MemberUpdateRequest;
@@ -14,6 +17,8 @@ import com.studymate.backend.member.exception.NotFoundMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -31,12 +36,12 @@ public class MemberService {
 
         Member member = memberMapper.toEntity(request);
 
-        ProfileImg image = ProfileImg.builder()
-                .name("프로필 사진이 없습니다.")
-                .member(member)
-                .build();
-
-        profileImgRepository.save(image);
+//        ProfileImg image = ProfileImg.builder()
+//                .name("프로필 사진이 없습니다.")
+//                .member(member)
+//                .build();
+//
+//        profileImgRepository.save(image);
         memberRepository.save(member);
 
         return "회원가입이 완료되었습니다.";
@@ -44,11 +49,8 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberResponse getMyMemberWithAuthorities() {
-        return memberMapper.toResponse(
-                SecurityUtil.getCurrentUsername()
-                        .flatMap(memberRepository::findOneWithAuthoritiesByEmail)
-                        .orElseThrow(() -> new NotFoundMemberException("Member not found"))
-        );
+        Member member = getMember();
+        return memberMapper.toResponse(member);
     }
 
     @Transactional
@@ -79,5 +81,9 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         return member;
+    }
+    public MemberListResponse findMentorByInterest(Interests interests) {
+        List<Member> memberList = memberRepository.findAllByInterestsAndPart(interests, Part.MENTOR);
+        return memberMapper.toListResponse(memberList);
     }
 }
