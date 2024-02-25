@@ -1,5 +1,6 @@
 package com.studymate.backend.chat.controller;
 
+import com.studymate.backend.chat.dto.response.ChatMessageResponse;
 import com.studymate.backend.chat.dto.response.ChattingRoomResponse;
 import com.studymate.backend.chat.entity.ChattingRoom;
 import com.studymate.backend.chat.service.ChattingRoomService;
@@ -19,13 +20,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/chat/rooms")
 @Tag(name = "Chat", description = "Chatting API")
 public class ChattingRoomController {
     private final ChattingRoomService chattingRoomService;
 
     // 채팅방 생성
-    @PostMapping("/chats")
+    @PostMapping
     @Operation(summary = "chattingroom create", description = "채팅방 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<ChattingRoomResponse> createChattingRoom(@AuthenticationPrincipal Member currentUser,
@@ -40,12 +41,22 @@ public class ChattingRoomController {
         return ResponseEntity.status(HttpStatus.CREATED).body(chattingRoomResponse);
     }
 
+    @Operation(summary = "chatmessages read", description = "채팅 내역 조회")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    @GetMapping("{chattingRoomId}/messages")
+    public ResponseEntity<List<ChatMessageResponse>> getChatMessage (@PathVariable Long chattingRoomId) {
+        // TODO: 해당하는 유저만 조회할 수 있도록 추가 작성하기
+        List<ChatMessageResponse> chatMessageList = chattingRoomService.findChatMessage(chattingRoomId);
 
-    // 특정 사용자의 채팅방 내역 조회
-    @GetMapping("/chats/user/{userId}")
-    public ResponseEntity<List<ChattingRoomResponse>> findChattingRoomsByUserId(@PathVariable Long userId) {
-        List<ChattingRoomResponse> chattingRooms = chattingRoomService.findChattingRoomsByUserId(userId);
-        return ResponseEntity.ok(chattingRooms);
+        return ResponseEntity.ok(chatMessageList);
+    }
+
+    @Operation(summary = "ChattingRoomList read", description = "채팅방 목록 조회")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    @GetMapping("/list")
+    public ResponseEntity<List<ChattingRoomResponse>> getChatRoomList () {
+        List<ChattingRoomResponse> chatRoomList = chattingRoomService.findChattingRoom();
+        return ResponseEntity.ok(chatRoomList);
     }
 
     // 채팅방 삭제
