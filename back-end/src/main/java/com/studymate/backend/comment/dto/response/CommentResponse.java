@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class CommentResponse {
-    private Long id;
+    private Long comment_id;
 
     private String content;
 
@@ -31,7 +31,7 @@ public class CommentResponse {
         String nickname = (member != null) ? member.getNickname() : null;
 
         return CommentResponse.builder()
-                .id(comment.getId())
+                .comment_id(comment.getId())
                 .content(comment.getContent())
                 .nickname(nickname)
                 .post_id(comment.getPost().getId())
