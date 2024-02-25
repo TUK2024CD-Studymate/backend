@@ -68,9 +68,9 @@ public class ChattingRoomService {
     }
 
     // 사용자의 채팅방 내역
-    public List<ChattingRoomResponse> findChattingRoomsByUserId(Long userId) {
-        List<ChatParticipation> chatParticipations = chatParticipationRepository.findByUserId(userId);
-        return chatMapper.toChattingRoomList(chatParticipations);
+정    public List<ChattingRoomResponse> findChattingRoom() {
+        List<ChatParticipation> chattingRooms = chatParticipationRepository.findAll();
+        return chatMapper.toChattingRoomList(chattingRooms);
     }
 
     // 채팅방 삭제
