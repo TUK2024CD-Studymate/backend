@@ -39,7 +39,7 @@ public class PostController {
         return ResponseEntity.ok(postResponseDtoList);
     }
 
-    @GetMapping("/posts/{id}")
+    @GetMapping("/posts/{post_id}")
     @Operation(summary = "post read", description = "해당 게시글 읽기")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long id) {
@@ -47,7 +47,7 @@ public class PostController {
         return ResponseEntity.ok(postResponseDto);
     }
 
-    @PutMapping("/posts/{id}")
+    @PutMapping("/posts/{post_id}")
     @Operation(summary = "post update", description = "게시글 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -58,7 +58,7 @@ public class PostController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/posts/{post_id}")
     @Operation(summary = "post delete", description = "게시글 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),

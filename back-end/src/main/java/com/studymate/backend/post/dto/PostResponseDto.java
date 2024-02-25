@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class PostResponseDto {
-    private Long id;
+    private Long post_id;
 
     private String title;
 
