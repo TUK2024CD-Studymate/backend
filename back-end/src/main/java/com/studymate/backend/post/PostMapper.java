@@ -29,7 +29,7 @@ public class PostMapper {
         String nickname = (member != null) ? member.getNickname() : null;
 
         return PostResponseDto.builder()
-                .id(post.getId())
+                .post_id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
