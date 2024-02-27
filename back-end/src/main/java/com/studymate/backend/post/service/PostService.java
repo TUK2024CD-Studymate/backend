@@ -42,17 +42,17 @@ public class PostService {
     }
 
     // 게시글 조회
-    public PostResponseDto find(Long id) {
-        Post post = postRepository.findById(id)
+    public PostResponseDto find(Long post_id) {
+        Post post = postRepository.findById(post_id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
         return postMapper.toResponse(post);
     }
 
     // 게시글 수정
     @Transactional
-    public String updatePost(Long id, PostUpdateRequestDto requestDto) {
+    public String updatePost(Long post_id, PostUpdateRequestDto requestDto) {
         Member member = memberService.getMember(); // 현재 인증된 회원 확인
-        Post post = serviceValidator.validatePostOwnership(id, member); // 게시글 소유권 검증
+        Post post = serviceValidator.validatePostOwnership(post_id, member); // 게시글 소유권 검증
 
         post.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getCategory(), requestDto.getInterests(), requestDto.getRecruitmentStatus());
         return "success";
@@ -60,9 +60,9 @@ public class PostService {
 
     // 게시글 삭제
     @Transactional
-    public String deletePost(Long id){
+    public String deletePost(Long post_id){
         Member member = memberService.getMember();
-        Post post = serviceValidator.validatePostOwnership(id, member);
+        Post post = serviceValidator.validatePostOwnership(post_id, member);
         postRepository.delete(post);
         return "success";
     }

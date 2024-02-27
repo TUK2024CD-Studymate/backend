@@ -42,8 +42,8 @@ public class PostController {
     @GetMapping("/posts/{post_id}")
     @Operation(summary = "post read", description = "해당 게시글 읽기")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long id) {
-        PostResponseDto postResponseDto = postService.find(id);
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long post_id) {
+        PostResponseDto postResponseDto = postService.find(post_id);
         return ResponseEntity.ok(postResponseDto);
     }
 
@@ -53,8 +53,8 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
     })
-    public ResponseEntity<String> updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
-        String result = postService.updatePost(id, requestDto);
+    public ResponseEntity<String> updatePost(@PathVariable Long post_id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
+        String result = postService.updatePost(post_id, requestDto);
         return ResponseEntity.ok(result);
     }
 
@@ -64,8 +64,8 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
     })
-    public ResponseEntity<String> deletePost(@PathVariable Long id) {
-        String result = postService.deletePost(id);
+    public ResponseEntity<String> deletePost(@PathVariable Long post_id) {
+        String result = postService.deletePost(post_id);
         return ResponseEntity.ok(result);
     }
 
