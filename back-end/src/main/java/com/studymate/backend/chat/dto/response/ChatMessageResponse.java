@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
+가@Setter
 public class ChatMessageResponse {
     private String sender;
 
@@ -16,4 +17,6 @@ public class ChatMessageResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime sendTime;
+
+    private String chattingroom_id;
 }
