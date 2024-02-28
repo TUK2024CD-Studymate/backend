@@ -38,6 +38,13 @@ spring:
     init:
       mode: always
 
+  rabbitmq:
+    host: rabbit
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
   servlet:
     multipart:
       maxFileSize: 10MB
