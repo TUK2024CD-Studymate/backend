@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-가@Setter
+@Setter
 public class ChatMessageResponse {
     private String sender;
 

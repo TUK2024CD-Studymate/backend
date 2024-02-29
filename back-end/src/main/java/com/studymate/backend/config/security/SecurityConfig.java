@@ -56,7 +56,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers("/api/signIn", "api/login").permitAll()
                                 .requestMatchers("/api/meeting/**").permitAll()
+                                .requestMatchers("/api/chat/**").permitAll()
                                 .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/localhost:15672/").permitAll()
 //                        .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .anyRequest().authenticated()
                 )
