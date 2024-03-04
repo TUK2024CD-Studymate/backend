@@ -8,8 +8,9 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDate;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Builder
@@ -33,6 +34,8 @@ public class StudyCalender extends BaseTimeEntity {
 
     private LocalDateTime endTime;
 
+    private LocalTime entireTime;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -44,5 +47,21 @@ public class StudyCalender extends BaseTimeEntity {
         this.studyClass = studyClass;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public long convertMinutes(LocalDateTime startTime, LocalDateTime endTime) {
+        Duration time = Duration.between(startTime, endTime);
+        return time.toMinutes();
+    }
+
+    public void setEntireTime(long time) {
+        Duration duration = Duration.ofMinutes(time);
+        long hours = duration.toHours();
+        int minutes = duration.toMinutesPart();
+        this.entireTime = LocalTime.of((int) hours, minutes);
+    }
+
+    public String serializeTime(LocalTime time) {
+        return time.toString();
     }
 }

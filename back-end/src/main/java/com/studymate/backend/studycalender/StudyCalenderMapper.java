@@ -34,6 +34,7 @@ public class StudyCalenderMapper {
                 .endTime(studyCalender.getEndTime())
                 .studyClass(studyCalender.getStudyClass())
                 .startTime(studyCalender.getStartTime())
+                .entireTime(studyCalender.serializeTime(studyCalender.getEntireTime()))
                 .build();
     }
 
