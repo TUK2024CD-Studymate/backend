@@ -38,6 +38,8 @@ public class StudyCalenderService {
         validator.timeValidator(startTime, endTime);
 
         StudyCalender calender = studyCalenderMapper.toEntity(request, member);
+        long minutes = calender.convertMinutes(startTime, endTime);
+        calender.setEntireTime(minutes);
 
         studyCalenderRepository.save(calender);
 
