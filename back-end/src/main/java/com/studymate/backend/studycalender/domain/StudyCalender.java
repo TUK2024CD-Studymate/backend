@@ -48,4 +48,20 @@ public class StudyCalender extends BaseTimeEntity {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    public long convertMinutes(LocalDateTime startTime, LocalDateTime endTime) {
+        Duration time = Duration.between(startTime, endTime);
+        return time.toMinutes();
+    }
+
+    public void setEntireTime(long time) {
+        Duration duration = Duration.ofMinutes(time);
+        long hours = duration.toHours();
+        int minutes = duration.toMinutesPart();
+        this.entireTime = LocalTime.of((int) hours, minutes);
+    }
+
+    public String serializeTime(LocalTime time) {
+        return time.toString();
+    }
 }
