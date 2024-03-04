@@ -70,6 +70,9 @@ public class StudyCalenderService {
 
         validator.calenderExistValidator(calender);
 
+        long minutes = calender.convertMinutes(startTime, endTime);
+        calender.setEntireTime(minutes);
+
         calender.update(request.getContent(), request.getInterests(),
                 request.getStartTime(), request.getEndTime());
 
