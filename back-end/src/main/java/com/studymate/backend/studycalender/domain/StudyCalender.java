@@ -8,8 +8,9 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDate;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Builder
@@ -32,6 +33,8 @@ public class StudyCalender extends BaseTimeEntity {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+
+    private LocalTime entireTime;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
