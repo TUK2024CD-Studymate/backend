@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CalenderResponse {
     private Long id;
+
     private String content;
 
     private Interests studyClass;
@@ -22,4 +23,6 @@ public class CalenderResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime endTime;
+
+    private String entireTime;
 }
