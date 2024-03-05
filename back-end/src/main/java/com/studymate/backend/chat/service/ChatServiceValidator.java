@@ -21,16 +21,16 @@ public class ChatServiceValidator {
                 .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chattingRoomId));
     }
 
-    public List<ChatParticipation> validateUserParticipation(Long userId) {
-        List<ChatParticipation> participations = chatParticipationRepository.findByUserId(userId);
+    public List<ChatParticipation> validateUserParticipation(Long memberId) {
+        List<ChatParticipation> participations = chatParticipationRepository.findByMemberId(memberId);
         if (participations.isEmpty()) {
-            throw new ChatParticipationNotFoundException("사용자 ID에 해당하는 채팅 참여내역을 찾을 수 없습니다: " + userId);
+            throw new ChatParticipationNotFoundException("사용자 ID에 해당하는 채팅 참여내역을 찾을 수 없습니다: " + memberId);
         }
         return participations;
     }
 
-    public boolean checkForDuplicatedParticipation(Long userId) {
-        return chatParticipationRepository.existsByUserId(userId);
+    public boolean checkForDuplicatedParticipation(Long memberId) {
+        return chatParticipationRepository.existsByMemberId(memberId);
     }
 
 }

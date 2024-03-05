@@ -46,7 +46,7 @@ public class ChattingRoomService {
 
     // 채팅 참여 중복 여부
     public boolean duplicatedChatParticipation(Member member){
-        return chatParticipationRepository.existsByUserId(member.getId());
+        return chatParticipationRepository.existsByMemberId(member.getId());
     }
 
     // userId 통해서 채팅 참여 내역 찾기
@@ -68,7 +68,7 @@ public class ChattingRoomService {
     }
 
     // 사용자의 채팅방 내역
-정    public List<ChattingRoomResponse> findChattingRoom() {
+    public List<ChattingRoomResponse> findChattingRoom() {
         List<ChatParticipation> chattingRooms = chatParticipationRepository.findAll();
         return chatMapper.toChattingRoomList(chattingRooms);
     }
