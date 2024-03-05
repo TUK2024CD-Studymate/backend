@@ -74,6 +74,10 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-
-
+    // 내가 쓴 게시물 조회
+    public List<PostResponseDto> findMemberPost() {
+        Member member = memberService.getMember();
+        List<Post> posts = postRepository.findAllByMember(member);
+        return posts.stream().map(postMapper::toResponse).collect(Collectors.toList());
+    }
 }
