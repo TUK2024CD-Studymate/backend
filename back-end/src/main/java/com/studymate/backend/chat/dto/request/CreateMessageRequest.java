@@ -16,4 +16,6 @@ public class CreateMessageRequest {
 
     @Schema(description = "보낸 사람", nullable = false, example = "최지혜")
     private String sender;
+
+
 }
