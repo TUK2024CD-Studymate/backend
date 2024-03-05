@@ -4,6 +4,8 @@ import com.studymate.backend.config.security.jwt.JwtFilter;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.dto.*;
 import com.studymate.backend.member.service.MemberService;
+import com.studymate.backend.post.dto.PostResponseDto;
+import com.studymate.backend.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class MemberController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberService memberService;
+    private final PostService postService;
 
     @PostMapping("/signIn")
     @Operation(summary = "member sign in", description = "회원이 회원가입을 한다.")
@@ -70,6 +75,14 @@ public class MemberController {
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<MemberResponse> update(@Valid @RequestBody MemberUpdateRequest request) {
         return ResponseEntity.ok(memberService.update(request));
+    }
+
+    @GetMapping("/user/post")
+    @PreAuthorize("hasAnyRole('USER')")
+    @Operation(summary = "find members post", description = "자신이 작성한 게시물을 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<PostResponseDto>> getMyPost() {
+        return ResponseEntity.ok(postService.findMemberPost());
     }
 
     @DeleteMapping("/user")
