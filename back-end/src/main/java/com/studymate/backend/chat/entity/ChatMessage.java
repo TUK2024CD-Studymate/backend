@@ -22,10 +22,13 @@ public class ChatMessage extends BaseTimeEntity {
     private LocalDateTime sendTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String senderName;
+    private String receiverName;
+
+    @ManyToOne
     @JoinColumn(name = "chattingroom_id")
     private ChattingRoom chattingRoom;
 }

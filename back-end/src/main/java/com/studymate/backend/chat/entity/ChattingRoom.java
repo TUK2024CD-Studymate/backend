@@ -19,10 +19,11 @@ public class ChattingRoom extends BaseTimeEntity {
     @Column(name = "chattingroom_id")
     private Long id;
 
-    @OneToMany(mappedBy = "ChattingRoom", cascade = CascadeType.ALL)
-    private final List<ChatMessage> chatMessageList = new ArrayList<>();
+    @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL)
+    private List<ChatMessage> chatMessageList;
 
-    @OneToMany(mappedBy = "ChattingRoom", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "chattingRoom", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private final List<ChatParticipation> chatParticipationList = new ArrayList<>();
+
 
 }
