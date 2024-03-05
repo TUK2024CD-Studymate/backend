@@ -4,15 +4,25 @@ import com.studymate.backend.chat.entity.ChatParticipation;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
+@Component
+@Slf4j
+@RequiredArgsConstructor
+@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class StompHandler implements ChannelInterceptor {
     private TokenProvider tokenProvider;
-    private ChatParticipation chatParticipation;
     private CustomUserDetailsService customUserDetailsService;
 
     public Message<?> preSend(Message<?> message, MessageChannel channel){
@@ -26,6 +36,7 @@ public class StompHandler implements ChannelInterceptor {
                 String username = tokenProvider.extractUsername(authorization);
                 Member member = (Member) customUserDetailsService.loadUserByUsername(username);
 
+                Objects.requireNonNull(accessor.getSessionAttributes()).put("Member", member);
             }
         }
         return message;

@@ -7,18 +7,20 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.StompSubProtocolHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+@Component
 public class StompExceptionHandler extends StompSubProtocolHandler {
     private static final byte[] EMPTY_PAYLOAD = new byte[0];
     public StompExceptionHandler(){
         super();
     }
 
-    @Override
+
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage,
                                                               Throwable ex) {
 
@@ -28,7 +30,7 @@ public class StompExceptionHandler extends StompSubProtocolHandler {
             return handleUnauthorizedException(clientMessage, exception);
         }
 
-        return super.handleClientMessageProcessingError(clientMessage, ex);
+        return super.getErrorHandler().handleClientMessageProcessingError(clientMessage, ex);
 
     }
 
@@ -80,7 +82,7 @@ public class StompExceptionHandler extends StompSubProtocolHandler {
     }
 
     //2
-    @Override
+
     protected Message<byte[]> handleInternal(StompHeaderAccessor errorHeaderAccessor,
                                              byte[] errorPayload, Throwable cause, StompHeaderAccessor clientHeaderAccessor) {
 
