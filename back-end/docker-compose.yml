@@ -27,10 +27,34 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+#      RABBIT_HOST: rabbitmq
     ports:
       - "8080:8080"
     volumes:
       - .:/app
+    networks:
+      - study_mate
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3.12.11-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "61613:61613"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    command:
+      - bash
+      - -c
+      - |
+        rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-server
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
     networks:
       - study_mate
 
@@ -40,3 +64,6 @@ volumes:
 networks:
   study_mate:
     driver: bridge
+
+
+
