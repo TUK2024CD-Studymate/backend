@@ -27,7 +27,7 @@ public class CommentController {
 
 
     @PostMapping("/posts/{post_id}/comments")
-    @Operation(summary = "comment create", description = "댓글 생성")
+    @Operation(summary = "댓글 생성", description = "회원이 댓글을 생성한다")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<CommentResponse> createComment(@PathVariable("post_id") Long id,
                                                          @Valid @RequestBody CommentRequest requestDto){
@@ -37,7 +37,7 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{post_id}/comments")
-    @Operation(summary = "comments read", description = "해당 게시글의 댓글 읽기")
+    @Operation(summary = "댓글 조회", description = "해당 게시글의 댓글을 불러온다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<CommentResponse>> getCommentsByPostId(@PathVariable("post_id") Long postId){
         List<CommentResponse> comments = commentService.list(postId);
@@ -45,7 +45,7 @@ public class CommentController {
     }
 
     @PutMapping("/posts/{post_id}/comments/{comment_id}")
-    @Operation(summary = "comment update", description = "댓글 수정")
+    @Operation(summary = "댓글 수정", description = "회원이 작성한 댓글을 수정한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 댓글만 수정 및 삭제가 가능합니다.")
@@ -58,7 +58,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/posts/{post_id}/comments/{comment_id}")
-    @Operation(summary = "comment delete", description = "댓글 삭제")
+    @Operation(summary = "댓글 삭제", description = "회원이 작성한 댓글을 삭제한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 댓글만 수정 및 삭제가 가능합니다.")
