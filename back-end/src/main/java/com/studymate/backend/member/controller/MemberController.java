@@ -63,7 +63,7 @@ public class MemberController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @Operation(summary = "get member info", description = "회원정보를 단건으로 조회한다")
+    @Operation(summary = "회원정보 조회", description = "자신의 회원정보를 단건으로 조회한다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<MemberResponse> getMyUserInfo() {
         return ResponseEntity.ok(memberService.getMyMemberWithAuthorities());

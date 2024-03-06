@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Memeber update reqeust")
+@Schema(description = "회원의 정보를 수정할때 필요한 데이터")
 public class MemberUpdateRequest {
     @NotBlank
     @Schema(description = "사용자가 바꿀 이름", nullable = false, example = "김영환")

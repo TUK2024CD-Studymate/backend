@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@Schema(description = "Member Update Calender request")
+@Schema(description = "스터디 기록을 수정할때 필요한 데이터")
 public class CalenderUpdateRequest {
 
     @NotBlank
