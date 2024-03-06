@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Memeber update reqeust")
 public class MemberUpdateRequest {
     @NotBlank
-    @Schema(description = "사용자가 바꿀 이름", nullable = false, example = "민정")
+    @Schema(description = "사용자가 바꿀 이름", nullable = false, example = "김영환")
     private String name;
     @NotNull
     @Schema(description = "사용자가 바꿀 멘토, 멘티여부", nullable = false, example = "MENTEE")
@@ -27,13 +27,13 @@ public class MemberUpdateRequest {
     @Schema(description = "사용자가 바꿀 관심분야", nullable = false, example = "ENGLISH")
     private Interests interests;
     @NotBlank
-    @Schema(description = "사용자가 바꿀 닉네임", nullable = false, example = "화난사람")
+    @Schema(description = "사용자가 바꿀 닉네임", nullable = false, example = "영환영어")
     private String nickname;
     @Schema(description = "사용자의 블로그URL", nullable = true, example = "https://hothoony.tistory.com/890")
     private String blogUrl;
-    @Schema(description = "사용자 PR요소", nullable = true, example = "한국공학대학교 SW공모전 대상경험, 해커톤 우수상")
+    @Schema(description = "사용자 PR요소", nullable = true, example = "전 메가스터디 영어 강사")
     private String publicRelations;
     @NotBlank
-    @Schema(description = "사용자 직장", nullable = false, example = "KAKAO개발자")
+    @Schema(description = "사용자 직장", nullable = false, example = "영어학원 원장")
     private String job;
 }

@@ -16,27 +16,27 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "Question", description = "Question API")
+@Tag(name = "질문", description = "질문 API")
 public class QuestionController {
 
     private final QuestionService questionService;
 
     @PostMapping("/question")
-    @Operation(summary = "question create", description = "질문 작성")
+    @Operation(summary = "질문 작성", description = "사용자가 질문을 작성한다")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<QuestionResponse> create(@RequestBody QuestionCreateRequest request) {
         return ResponseEntity.ok().body(questionService.create(request));
     }
 
     @GetMapping("/question/{questionId}")
-    @Operation(summary = "get question info ", description = "질문 상세보기")
+    @Operation(summary = "질문 조회", description = "특정 질문을 불러온다")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<QuestionResponse> getQuestion(@PathVariable("questionId") Long id) {
         return ResponseEntity.ok().body(questionService.getQuestion(id));
     }
 
     @GetMapping("/question")
-    @Operation(summary = "get question list ", description = "회원별 질문한 리스트 조회")
+    @Operation(summary = "질문 전체 조회", description = "회원별로 질문한 리스트를 불러온다")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<List<QuestionResponse>> getQuestions() {
         return ResponseEntity.ok().body(questionService.getQuestions());

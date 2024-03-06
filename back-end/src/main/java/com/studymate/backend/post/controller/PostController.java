@@ -18,13 +18,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Post", description = "Post API")
+@Tag(name = "게시물", description = "게시물 API")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
 
     @PostMapping("/posts")
-    @Operation(summary = "post create", description = "게시글 생성")
+    @Operation(summary = "게시글 생성", description = "게시글을 생성한다")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto requestDto) {
         PostResponseDto postResponseDto = postService.save(requestDto);
@@ -32,7 +32,7 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    @Operation(summary = "all posts read", description = "전체 게시글 읽기")
+    @Operation(summary = "전체 게시글 조회", description = "전체 게시글을 불러온다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<PostResponseDto>> postList(){
         List<PostResponseDto> postResponseDtoList = postService.list();
@@ -40,7 +40,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/{post_id}")
-    @Operation(summary = "post read", description = "해당 게시글 읽기")
+    @Operation(summary = "특정 게시글 조회", description = "해당 게시글의 정보를 불러온다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long post_id) {
         PostResponseDto postResponseDto = postService.find(post_id);
@@ -48,7 +48,7 @@ public class PostController {
     }
 
     @PutMapping("/posts/{post_id}")
-    @Operation(summary = "post update", description = "게시글 수정")
+    @Operation(summary = "게시글 수정", description = "해당 게시글을 수정한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
@@ -59,7 +59,7 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{post_id}")
-    @Operation(summary = "post delete", description = "게시글 삭제")
+    @Operation(summary = "게시글 삭제", description = "해당 게시글을 삭제한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "403", description = "본인의 게시글만 수정 및 삭제가 가능합니다.")
@@ -70,7 +70,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/search")
-    @Operation(summary = "Search posts by keyword", description = "키워드로 게시글 검색")
+    @Operation(summary = "게시글 검색", description = "키워드로 게시글을 검색한다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<PostResponseDto>> searchPostsByKeyword(@RequestParam String keyword) {
         List<PostResponseDto> postResponseDtoList = postService.searchByKeyword(keyword);

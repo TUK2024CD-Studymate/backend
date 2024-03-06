@@ -17,14 +17,14 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/image")
-@Tag(name = "Member", description = "Member API")
+@Tag(name = "회원", description = "회원 API")
 public class ProfileImgController {
 
     private final ProfileImgService profileImgService;
 
     @PostMapping("/upload")
     @PreAuthorize("hasAnyRole('USER')")
-    @Operation(summary = "member profile image update", description = "회원이 프로필 사진을 바꾼다.")
+    @Operation(summary = "회원이 프로필 사진들 변경하는 API", description = "회원이 프로필 사진을 바꾼다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<?> upload(@RequestParam("profileUrl") MultipartFile profileImgUpload) throws IOException {
         String image = profileImgService.upload(profileImgUpload);

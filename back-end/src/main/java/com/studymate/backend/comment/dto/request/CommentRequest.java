@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Schema(description = "Comment create/update request")
+@Schema(description = "댓글 생성시 필요한 데이터")
 public class CommentRequest {
 
     @NotBlank
-    @Schema(description = "댓글 내용", nullable = false, example = "안녕하시렵니까")
+    @Schema(description = "댓글 내용", nullable = false, example = "안녕하세요! 반갑습니다!")
     private String content;
 
     public Comment toEntity(Member member, Post post){

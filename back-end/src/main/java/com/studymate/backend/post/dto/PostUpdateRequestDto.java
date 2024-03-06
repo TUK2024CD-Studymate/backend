@@ -18,11 +18,11 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Post update request")
 public class PostUpdateRequestDto {
     @NotBlank
-    @Schema(description = "사용자가 바꿀 게시글 제목", nullable = false, example = "자바 공부")
+    @Schema(description = "사용자가 바꿀 게시글 제목", nullable = false, example = "영어 학원 추천")
     private String title;
 
     @NotBlank
-    @Schema(description = "사용자가 바꿀 게시글 내용", nullable = false, example = "스프링부트는 어렵다^^")
+    @Schema(description = "사용자가 바꿀 게시글 내용", nullable = false, example = "요즘 잘나가는 강남 영어학원 추천해주세요!")
     private String content;
 
     @NotNull

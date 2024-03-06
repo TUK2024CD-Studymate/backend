@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Schema(description = "Memeber sign-in reqeust")
+@Schema(description = "회원이 회원가입할때 필요한 데이터")
 public class MemberRequest {
     @Email
     @NotBlank
@@ -29,7 +29,7 @@ public class MemberRequest {
     @Schema(description = "사용자 전화번호", nullable = false, example = "01046666208")
     private String tel;
     @NotBlank
-    @Schema(description = "사용자 이름", nullable = false, example = "정환")
+    @Schema(description = "사용자 이름", nullable = false, example = "김영한")
     private String name;
     @NotNull
     @Schema(description = "사용자 멘토,멘티 여부", nullable = false, example = "MENTOR")
@@ -38,13 +38,13 @@ public class MemberRequest {
     @Schema(description = "사용자 관심분야", nullable = false, example = "PROGRAMMING")
     private Interests interests;
     @NotBlank
-    @Schema(description = "사용자 닉네임", nullable = false, example = "정환코딩")
+    @Schema(description = "사용자 닉네임", nullable = false, example = "영한코딩")
     private String nickname;
     @Schema(description = "사용자의 블로그URL", nullable = true, example = "https://dnfjrdl.tistory.com/category")
     private String blogUrl;
-    @Schema(description = "사용자 PR요소", nullable = true, example = "한국공학대학교 SW공모전 대상경험")
+    @Schema(description = "사용자 PR요소", nullable = true, example = "인프런 강사")
     private String publicRelations;
     @NotBlank
-    @Schema(description = "사용자 직장", nullable = false, example = "Kaist")
+    @Schema(description = "사용자 직장", nullable = false, example = "우아한 형제들 기술이사")
     private String job;
 }
