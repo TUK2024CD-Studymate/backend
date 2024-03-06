@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "Comment", description = "Comment API")
+@Tag(name = "댓글", description = "댓글 API")
 public class CommentController {
     private final CommentService commentService;
     private final PostRepository postRepository;

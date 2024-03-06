@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Schema(description = "Post create request")
+@Schema(description = "게시글을 생성할때 필요한 데이터")
 public class PostRequestDto {
 
     @NotBlank
-    @Schema(description = "게시글 제목", nullable = false, example = "자바 공부")
+    @Schema(description = "게시글 제목", nullable = false, example = "자바를 공부했습니다.")
     private String title;
 
     @NotBlank
-    @Schema(description = "게시글 내용", nullable = false, example = "스프링부트는 어렵다^^")
+    @Schema(description = "게시글 내용", nullable = false, example = "자바 객체의 불변성에 대해 대학교 동기와 같이 책을 읽고 공부했어요.")
     private String content;
 
     @NotNull
