@@ -16,6 +16,7 @@ public class MemberResponse {
     private String nickname;
     private Part part;
     private String email;
+    private String tel;
     private Interests interests;
 //    private String imageUrl;
     private String blogUrl;

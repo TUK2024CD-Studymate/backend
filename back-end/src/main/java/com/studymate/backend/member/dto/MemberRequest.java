@@ -26,6 +26,9 @@ public class MemberRequest {
     @Schema(description = "사용자 비밀번호", nullable = false, example = "asdf1020")
     private String password;
     @NotBlank
+    @Schema(description = "사용자 전화번호", nullable = false, example = "01046666208")
+    private String tel;
+    @NotBlank
     @Schema(description = "사용자 이름", nullable = false, example = "정환")
     private String name;
     @NotNull
