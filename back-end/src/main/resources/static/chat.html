@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+
+<!--    <script type="text/javascript" src="/chat.js"></script>-->
+</head>
+<body>
+<div>
+    <h2>WebSocket Chat</h2>
+    <form onsubmit="return false;" id="connectForm">
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()" disabled>Disconnect</button>
+    </form>
+    <form onsubmit="sendMessage(); return false;" id="messageForm">
+        <input type="text" id="message" autocomplete="off"/>
+        <button>Send</button>
+    </form>
+    <form onsubmit="enterRoom(); return false;" id="enterForm">
+        <input type="text" id="room" placeholder="Room ID" autocomplete="off"/>
+        <button>Enter Room</button>
+    </form>
+    <div id="chat"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="text/javascript" src="/static/chat.js"></script>
+</body>
+</html>

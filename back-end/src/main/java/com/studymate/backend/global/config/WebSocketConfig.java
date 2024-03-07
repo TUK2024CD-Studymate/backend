@@ -20,30 +20,33 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
-                .setRelayHost("rabbitmq")
-                .setRelayPort(61613)
-                .setClientLogin("guest")
-                .setClientPasscode("guest");
+//        registry
+//                .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
+//                .setRelayHost("rabbitmq")
+//                .setRelayPort(61613)
+//                .setClientLogin("guest")
+//                .setClientPasscode("guest");
         registry.enableSimpleBroker("/sub");
-        registry.enableSimpleBroker("/pub");
-//        registry.setApplicationDestinationPrefixes("/pub");
-        registry.setPathMatcher(new AntPathMatcher("."));
+        registry.setApplicationDestinationPrefixes("/pub");
+
+//        registry.setPathMatcher(new AntPathMatcher("."));
     }
     @Override
     public void registerStompEndpoints (StompEndpointRegistry registry){
-        registry.setErrorHandler(stompExceptionHandler.getErrorHandler())
-                .addEndpoint("/ws")
+        registry.addEndpoint("/ws-stomp")
+//                .addInterceptors()
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
+        //.setErrorHandler(stompExceptionHandler)
+
     }
 
     /*어플리케이션 내부에서 사용할 path를 지정할 수 있음*/
 
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(stompHandler);
+//    }
 
 }

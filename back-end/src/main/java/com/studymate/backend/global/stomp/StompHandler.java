@@ -3,6 +3,7 @@ package com.studymate.backend.global.stomp;
 import com.studymate.backend.chat.entity.ChatParticipation;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.member.domain.UserDetail;
 import com.studymate.backend.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +29,18 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel){
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        log.info("ㅎㅇ");
         // websocket 연결했을 때 헤더의 jwt token 유효성 검증
         if(StompCommand.CONNECT == accessor.getCommand()){
             final String authorization = tokenProvider.extractJwt(accessor);
 
+//            tokenProvider.validateToken(authorization);
+
             if(tokenProvider.validateToken(authorization)){
                 String username = tokenProvider.extractUsername(authorization);
-                Member member = (Member) customUserDetailsService.loadUserByUsername(username);
+                UserDetail userDetail = (UserDetail) customUserDetailsService.loadUserByUsername(username);
 
-                Objects.requireNonNull(accessor.getSessionAttributes()).put("Member", member);
+                Objects.requireNonNull(accessor.getSessionAttributes()).put("UserDetail", userDetail);
             }
         }
         return message;

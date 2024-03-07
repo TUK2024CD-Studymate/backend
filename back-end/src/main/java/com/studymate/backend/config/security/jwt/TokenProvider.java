@@ -86,6 +86,9 @@ public class TokenProvider implements InitializingBean {
             logger.info("Extracted JWT token: {}", token);
             return token;
         }
+
+        logger.info("안됨;;");
+
         return null;
     }
 
