@@ -25,7 +25,7 @@ public class StudyCalenderController {
     @PostMapping("/calender")
     @Operation(summary = "스터디 기록 생성", description = "회원이 스터디 기록을 생성한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<Long> createPost(@Valid @RequestBody CalenderCreateRequest request) {
+    public ResponseEntity<CalenderResponse> createPost(@Valid @RequestBody CalenderCreateRequest request) {
         return ResponseEntity.ok(studyCalenderService.createPost(request));
     }
 
