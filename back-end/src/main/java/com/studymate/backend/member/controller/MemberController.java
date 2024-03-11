@@ -1,5 +1,6 @@
 package com.studymate.backend.member.controller;
 
+import com.studymate.backend.commons.firebase.FCMTokenManager;
 import com.studymate.backend.config.security.jwt.JwtFilter;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.dto.*;
@@ -34,6 +35,7 @@ public class MemberController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberService memberService;
     private final PostService postService;
+    private final FCMTokenManager fcmTokenManager;
 
     @PostMapping("/signIn")
     @Operation(summary = "회원가입", description = "회원이 회원가입을 한다.")
@@ -45,7 +47,7 @@ public class MemberController {
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "회원이 로그인을 한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<TokenDto> authorize(@Valid @RequestBody MemberLoginRequest request) {
+    public ResponseEntity<TokenDto> authorizeWhitFCM(@Valid @RequestBody MemberLoginRequest request) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
@@ -57,6 +59,8 @@ public class MemberController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+
+        memberService.fcmLogin(request);
 
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }

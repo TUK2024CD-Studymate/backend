@@ -1,5 +1,6 @@
 package com.studymate.backend.member.service;
 
+import com.studymate.backend.commons.firebase.FCMTokenManager;
 import com.studymate.backend.config.security.SecurityUtil;
 import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.file.domain.ProfileImg;
@@ -8,10 +9,7 @@ import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.domain.Part;
-import com.studymate.backend.member.dto.MemberListResponse;
-import com.studymate.backend.member.dto.MemberRequest;
-import com.studymate.backend.member.dto.MemberResponse;
-import com.studymate.backend.member.dto.MemberUpdateRequest;
+import com.studymate.backend.member.dto.*;
 import com.studymate.backend.member.exception.DuplicateMemberException;
 import com.studymate.backend.member.exception.NotFoundMemberException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,7 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final ProfileImgRepository profileImgRepository;
+    private final FCMTokenManager fcmTokenManager;
 
     @Transactional
     public String signup(MemberRequest request) {
@@ -35,13 +33,6 @@ public class MemberService {
         }
 
         Member member = memberMapper.toEntity(request);
-
-//        ProfileImg image = ProfileImg.builder()
-//                .name("프로필 사진이 없습니다.")
-//                .member(member)
-//                .build();
-//
-//        profileImgRepository.save(image);
         memberRepository.save(member);
 
         return "회원가입이 완료되었습니다.";
@@ -85,5 +76,20 @@ public class MemberService {
     public MemberListResponse findMentorByInterest(Interests interests) {
         List<Member> memberList = memberRepository.findAllByInterestsAndPart(interests, Part.MENTOR);
         return memberMapper.toListResponse(memberList);
+    }
+
+    public void fcmLogin(MemberLoginRequest request) {
+        final String fcmToken = request.getFcmToken();
+        Member member = memberRepository.findByEmail(request.getEmail());
+        final Long memberId = member.getId();
+        deleteAndSaveFCMToken(fcmToken, memberId);
+    }
+
+    /*
+     * 기존에 존재하는 Fcm토큰을 삭제한다.
+     * Redis에 사용자 아이디를 Key로 Fcm토큰을 저장한다.
+     */
+    private void deleteAndSaveFCMToken(String fcmToken, Long userId) {
+        fcmTokenManager.deleteAndSaveFCMToken(String.valueOf(userId),fcmToken);
     }
 }

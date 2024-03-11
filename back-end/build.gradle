@@ -41,8 +41,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation('commons-io:commons-io:2.11.0')
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	implementation 'com.google.code.gson:gson:2.8.9'
 
+	//FCM
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.8.1'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	implementation 'net.nurigo:javaSDK:2.2'
 
 	compileOnly 'org.projectlombok:lombok'
 

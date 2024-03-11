@@ -16,6 +16,14 @@ services:
       - mariadb_data:/var/lib/mariadb
     networks:
       - study_mate
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - study_mate
 
   back-end:
     build: .
@@ -23,6 +31,7 @@ services:
     restart: always
     depends_on:
       - db
+      - redis
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       MARIADB_USER: ${MARIADB_USER}

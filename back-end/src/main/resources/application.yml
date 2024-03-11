@@ -42,7 +42,12 @@ spring:
     multipart:
       maxFileSize: 10MB
       maxRequestSize: 30MB
-
+  data:
+    redis:
+      host: redis
+      port: 6379
+      ssl:
+        enabled: true
 logging:
   level:
     org.hibernate.SQL: debug;
@@ -52,3 +57,12 @@ jwt:
   header: Authorization
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
   token-validity-in-seconds: 86400
+
+firebase:
+  firebaseConfigPath: /firebase/studymate-92070-firebase-adminsdk-t4116-5c71b9db48.json
+  scope: https://www.googleapis.com/auth/cloud-platform
+
+#coolsms:
+#  fromnumber: "01046666208"
+#  apisecret: "7KRF3ZMYINDQFQWPZ0QLCDXPJGKIKPVL"
+#  apikey: "NCSONSCPVEQLAV0A"

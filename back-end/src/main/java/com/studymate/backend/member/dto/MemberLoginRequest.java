@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Memeber login reqeust")
+@Schema(description = "회원이 로그인할때 필요한 데이터")
 public class MemberLoginRequest {
     @NotBlank
     @Email
@@ -19,4 +19,5 @@ public class MemberLoginRequest {
     @NotBlank
     @Schema(description = "사용자 비밀번호", nullable = false, example = "asdf1020")
     private String password;
+    private String fcmToken;
 }
