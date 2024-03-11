@@ -43,6 +43,19 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+
+  freemarker:
+    cache: false
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
 logging:
   level:
     org.hibernate.SQL: debug;
