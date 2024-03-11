@@ -18,9 +18,9 @@ public class Matching extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long applicantId;
+    private Long senderId;  // 매칭 신청자 id값
 
-    private Long participantId;
+    private Long receiverId;  // 매칭 신청을 받는 사람의 id값
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -34,11 +34,11 @@ public class Matching extends BaseTimeEntity {
         this.member = member;
     }
 
-    public void confirmApplicantID(Member member) {
-        this.applicantId = member.getId();
+    public void confirmSenderId(Member member) {
+        this.senderId = member.getId();
     }
-    public void confirmParticipantId(Member member) {
-        this.participantId = member.getId();
+    public void confirmReceiverId(Member member) {
+        this.receiverId = member.getId();
     }
 
     public void confirmQuestion(Question question) {
