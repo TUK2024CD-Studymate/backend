@@ -3,24 +3,21 @@ package com.studymate.backend.chat.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
+import java.util.UUID;
+
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-@AllArgsConstructor
+@NoArgsConstructor
 public class ChatRoom {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chatRoom_id")
-    private Long id;
+    private String roomId;
+    private String roomName;
 
-    private String nickname;
 
-    public static ChatRoom create(String nickname) {
-        return ChatRoom.builder()
-                .nickname(nickname)
-                .build();
+    public static ChatRoom create(String name) {
+        ChatRoom room = new ChatRoom();
+        room.roomId = UUID.randomUUID().toString();
+        room.roomName = name;
+        return room;
     }
 }
