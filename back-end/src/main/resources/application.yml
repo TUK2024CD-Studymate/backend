@@ -62,7 +62,7 @@ firebase:
   firebaseConfigPath: /firebase/studymate-92070-firebase-adminsdk-t4116-5c71b9db48.json
   scope: https://www.googleapis.com/auth/cloud-platform
 
-#coolsms:
-#  fromnumber: "01046666208"
-#  apisecret: "7KRF3ZMYINDQFQWPZ0QLCDXPJGKIKPVL"
-#  apikey: "NCSONSCPVEQLAV0A"
+coolsms:
+  fromnumber: "01046666208"
+  apisecret: "7KRF3ZMYINDQFQWPZ0QLCDXPJGKIKPVL"
+  apikey: "NCSONSCPVEQLAV0A"
