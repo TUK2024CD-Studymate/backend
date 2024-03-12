@@ -62,7 +62,7 @@ public class ZoomController {
         String accessToken = list.get("access_token");
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
-        return ResponseEntity.ok().body(list);
+        return "zoomLogin";
     }
 
     @GetMapping("/api/meeting/create")
