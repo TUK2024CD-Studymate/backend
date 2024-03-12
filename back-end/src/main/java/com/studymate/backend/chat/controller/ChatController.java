@@ -1,4 +1,4 @@
-현package com.studymate.backend.chat.controller;
+package com.studymate.backend.chat.controller;
 
 import com.studymate.backend.chat.domain.ChatRoom;
 import com.studymate.backend.chat.service.ChatService;
@@ -13,12 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/chat")
 public class ChatController {
-
     private final ChatService chatService;
 
     // 채팅 리스트 화면
     @GetMapping("/room")
-    public String rooms(Model model){
+    public String rooms(Model model) {
         return "/chat/room";
     }
     // 모든 채팅방 목록 반환
@@ -43,6 +42,6 @@ public class ChatController {
     @GetMapping("/room/{roomId}")
     @ResponseBody
     public ChatRoom roomInfo(@PathVariable String roomId) {
-        return chatService.findByID(roomId);
+        return chatService.findById(roomId);
     }
 }
