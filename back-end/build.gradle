@@ -49,6 +49,8 @@ dependencies {
 
 	implementation 'net.nurigo:javaSDK:2.2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 	compileOnly 'org.projectlombok:lombok'
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
