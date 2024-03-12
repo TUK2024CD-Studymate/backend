@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,7 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ZoomController {
     private final ZoomService zoomService;
@@ -30,7 +31,7 @@ public class ZoomController {
 
     @RequestMapping(value = "/api/meeting/zoomApi", method = {RequestMethod.GET
             , RequestMethod.POST})
-    public ResponseEntity<?> googleAsync(HttpServletRequest req,
+    public String googleAsync(HttpServletRequest req,
                                          @RequestParam(required = false) String code) throws
             IOException, NoSuchAlgorithmException {
 
@@ -40,14 +41,14 @@ public class ZoomController {
 
         FormBody formBody = new FormBody.Builder()
                 .add("code", code)
-                .add("redirect_uri", "http://localhost:8080/api/meeting/zoomApi")
+                .add("redirect_uri", "http://studymate-tuk.kro.kr:8080/api/meeting/zoomApi")
                 .add("grant_type", "authorization_code")
                 .add("code_verifier", DecEncUtil.encode(code))
                 .build();
         Request zoomRequest = new Request.Builder()
                 .url(zoomUrl)
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Authorization", "Basic " + "OFJGQlVMTDRRV3FrN011TlhOS3dlUTpvMzcxZTFYYnpoNlNrWkFhbzNDQng5SzBCaTNhV3EwTw==")
+                .addHeader("Authorization", "Basic " + "Wmd0ODlLaVpScmk4U2tCcXdzMFNSZzo1WGNHNXY2bFF5MkJUNmFXMFN2MmdZMWRseWIyYU5Udg==")
                 .post(formBody)
                 .build();
 
@@ -117,7 +118,7 @@ public class ZoomController {
         Request zoomRequest = new Request.Builder()
                 .url(zoomUrl)
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Authorization","Basic " + "OFJGQlVMTDRRV3FrN011TlhOS3dlUTpvMzcxZTFYYnpoNlNrWkFhbzNDQng5SzBCaTNhV3EwTw")
+                .addHeader("Authorization","Basic " + "Wmd0ODlLaVpScmk4U2tCcXdzMFNSZzo1WGNHNXY2bFF5MkJUNmFXMFN2MmdZMWRseWIyYU5Udg==")
                 .post(formBody)
                 .build();
 
