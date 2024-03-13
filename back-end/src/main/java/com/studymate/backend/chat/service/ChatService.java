@@ -1,44 +1,74 @@
 package com.studymate.backend.chat.service;
 
+import com.studymate.backend.chat.domain.ChatMessage;
 import com.studymate.backend.chat.domain.ChatRoom;
-import jakarta.annotation.PostConstruct;
+import com.studymate.backend.chat.domain.UserChatRoom;
+import com.studymate.backend.chat.dto.ChatMessageRes;
+import com.studymate.backend.chat.dto.ChatRoomRes;
+import com.studymate.backend.chat.dto.CreateMessageReq;
+import com.studymate.backend.chat.mapper.ChatMapper;
+import com.studymate.backend.chat.repository.ChatMessageRepository;
+import com.studymate.backend.chat.repository.ChatRoomRepository;
+import com.studymate.backend.chat.repository.UserChatRoomRepository;
+import com.studymate.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ChatService {
 
-    private Map<String, ChatRoom> chatRooms;
+    private final UserChatRoomRepository userChatRoomRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatMapper chatMapper;
 
-    @PostConstruct
-    //의존관게 주입완료되면 실행되는 코드
-    private void init() {
-        chatRooms = new LinkedHashMap<>();
+    @Transactional
+    public ChatRoom createChatRoom() {
+        ChatRoom newChatRoom = ChatRoom.builder().build();
+        chatRoomRepository.save(newChatRoom);
+
+        return newChatRoom;
     }
 
-    //채팅방 불러오기
-    public List<ChatRoom> findAllRoom() {
-        //채팅방 최근 생성 순으로 반환
-        List<ChatRoom> result = new ArrayList<>(chatRooms.values());
-        Collections.reverse(result);
+    @Transactional
+    public void createUserChatRoom(Member member, Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chatRoomId));
+        UserChatRoom newUserChatRoom = chatMapper.toUserChatRoom(member, chatRoom);
 
-        return result;
+        userChatRoomRepository.save(newUserChatRoom);
     }
 
-    //채팅방 하나 불러오기
-    public ChatRoom findById(String roomId) {
-        return chatRooms.get(roomId);
+    public boolean duplicatedUserChatRoom(Member member) {
+        return userChatRoomRepository.existsByMemberId(member.getId());
     }
 
-    //채팅방 생성
-    public ChatRoom createRoom(String name) {
-        ChatRoom chatRoom = ChatRoom.create(name);
-        chatRooms.put(chatRoom.getRoomId(), chatRoom);
-        return chatRoom;
+    public UserChatRoom findUserChatRoomByMemberId(Long memberId) {
+        return userChatRoomRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다")); // TODO: 에러처리 수정
+    }
+
+    public void saveMessage(Member sender, Long chatRoomId, CreateMessageReq createMessageReq) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chatRoomId));
+        ChatMessage message = chatMapper.toChatMessage(sender, chatRoom, createMessageReq);
+
+        chatMessageRepository.save(message);
+    }
+
+    public List<ChatMessageRes> findChatMessage(Long chatRoomId) {
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
+
+        return chatMapper.toChatMessageList(chatMessages);
+    }
+
+    public List<ChatRoomRes> findChatRoom() {
+        List<UserChatRoom> chatRooms = userChatRoomRepository.findAll();
+
+        return chatMapper.toChatRoomList(chatRooms);
     }
 }
