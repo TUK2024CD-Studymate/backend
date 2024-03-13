@@ -68,4 +68,13 @@ public class CommentController {
         String result = commentService.deleteComment(postId, commentId);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/posts/{post_id}/comments/count")
+    @Operation(summary = "댓글 수 조회", description = "해당 게시글의 댓글 수를 반환한다")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<Long> countCommentsByPostId(@PathVariable("post_id") Long postId) {
+        Long count = commentService.countCommentsByPostId(postId);
+        return ResponseEntity.ok(count);
+    }
+
 }
