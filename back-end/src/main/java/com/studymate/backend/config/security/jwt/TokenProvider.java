@@ -7,17 +7,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestScope;
 
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -74,6 +77,39 @@ public class TokenProvider implements InitializingBean {
         User principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public String extractJwt(final StompHeaderAccessor accessor) {
+        String headerValue = accessor.getFirstNativeHeader("Authorization");
+        if (headerValue != null && headerValue.startsWith("Bearer ")) {
+            String token = headerValue.substring(7); // "Bearer " 부분을 제외하고 JWT 토큰만 추출
+            logger.info("Extracted JWT token: {}", token);
+            return token;
+        }
+
+        logger.info("안됨");
+
+        return null;
+    }
+
+    // 복호화
+    public Claims parseClaims(String accessToken) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
+
+    // 클레임 추출
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = parseClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
     public boolean validateToken(String token) {
