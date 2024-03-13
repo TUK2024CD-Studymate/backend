@@ -1,25 +1,30 @@
 package com.studymate.backend.chat.domain;
 
+import com.studymate.backend.global.BaseTimeEntity;
+import com.studymate.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@Builder
+@Entity
 @AllArgsConstructor
-public class ChatMessage {
-    public enum MessageType {
-        ENTER, TALK
-    }
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ChatMessage extends BaseTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_message_id")
+    private Long id;
+    private String content;
+    private LocalDateTime sendDate;
 
-    private MessageType type;
-    //채팅방 ID
-    private String roomId;
-    //보내는 사람
-    private String sender;
-    //내용
-    private String message;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
 }
