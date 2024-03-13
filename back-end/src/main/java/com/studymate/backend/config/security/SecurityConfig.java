@@ -57,6 +57,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/signIn", "api/login").permitAll()
                                 .requestMatchers("/api/meeting/**").permitAll()
                                 .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
+                                .requestMatchers("/api/chat/**").permitAll()
 //                        .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .anyRequest().authenticated()
                 )
