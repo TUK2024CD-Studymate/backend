@@ -1,5 +1,6 @@
 package com.studymate.backend.post.repository;
 
+import com.studymate.backend.heart.domain.Heart;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.post.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostCustomRep
     List<Post> findByKeyword(@Param("keyword") String keyword);
 
     List<Post> findAllByMember(Member member);
+
+    Post findByHeart(Heart heart);
 }
