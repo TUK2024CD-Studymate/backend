@@ -34,6 +34,8 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Interests interests;
 
+    private Integer likeCount;
+
     private Boolean recruitmentStatus;
 
 
