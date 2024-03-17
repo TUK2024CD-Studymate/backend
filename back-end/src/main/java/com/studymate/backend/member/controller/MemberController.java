@@ -89,6 +89,14 @@ public class MemberController {
         return ResponseEntity.ok(postService.findMemberPost());
     }
 
+    @GetMapping("/user/post/heart")
+    @PreAuthorize("hasAnyRole('USER')")
+    @Operation(summary = "좋아요를 누른 게시물 조회", description = "회원이 좋아요를 누른 게시물을 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<PostResponseDto>> getMyHeartPost() {
+        return ResponseEntity.ok(postService.getHeartPost());
+    }
+
     @DeleteMapping("/user")
     @PreAuthorize("hasAnyRole('USER')")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴(논리삭제)를 한다.")
