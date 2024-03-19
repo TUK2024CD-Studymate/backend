@@ -24,4 +24,12 @@ public class MatchingController {
     public ResponseEntity<MemberListResponse> getMentorList(@PathVariable("questionId") Long questionId) {
         return ResponseEntity.ok().body(matchingService.getMentorList(questionId));
     }
+
+    @GetMapping("/matching/{questionId}/{mentorId}")
+    @Operation(summary = "멘토 매칭 알림", description = "해당 멘토에게 LMS알림을 전송한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<String> matching(@PathVariable("questionId") Long questionId,
+                                           @PathVariable("mentorId") Long mentorId) {
+        return ResponseEntity.ok().body(matchingService.matchingForSms(questionId, mentorId));
+    }
 }

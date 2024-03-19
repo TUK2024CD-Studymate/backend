@@ -56,4 +56,9 @@ public class CommentService {
         commentRepository.delete(comment);
         return "success";
     }
+
+    // 댓글 수 반환
+    public Long countCommentsByPostId(Long postId) {
+        return commentRepository.countByPostId(postId);
+    }
 }

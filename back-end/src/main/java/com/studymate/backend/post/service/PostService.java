@@ -1,5 +1,7 @@
 package com.studymate.backend.post.service;
 
+import com.studymate.backend.heart.HeartRepository;
+import com.studymate.backend.heart.domain.Heart;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.post.PostMapper;
@@ -22,6 +24,8 @@ public class PostService {
     private final PostMapper postMapper;
     private final MemberService memberService;
     private final ServiceValidator serviceValidator;
+
+    private final HeartRepository heartRepository;
 
     // 게시글 생성
     @Transactional
@@ -78,6 +82,16 @@ public class PostService {
     public List<PostResponseDto> findMemberPost() {
         Member member = memberService.getMember();
         List<Post> posts = postRepository.findAllByMember(member);
+        return posts.stream().map(postMapper::toResponse).collect(Collectors.toList());
+    }
+
+    public List<PostResponseDto> getHeartPost() {
+        Member member = memberService.getMember();
+
+        List<Heart> heart = heartRepository.findAllByMember(member);
+
+        List<Post> posts = heart.stream().map(postRepository::findByHeart).toList();
+
         return posts.stream().map(postMapper::toResponse).collect(Collectors.toList());
     }
 }

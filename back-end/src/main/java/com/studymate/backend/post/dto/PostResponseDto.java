@@ -26,6 +26,8 @@ public class PostResponseDto {
 
     private Category category;
 
+    private Integer likeCount;
+
     private Interests interests;
 
     private Boolean recruitmentStatus;

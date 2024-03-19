@@ -64,6 +64,9 @@ public class Member extends BaseTimeEntity{
     @Column
     private boolean activated;
 
+    @Column(length = 1000)
+    private String fcmToken;
+
     @JoinTable(
             name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},

@@ -28,7 +28,7 @@ public class StudyCalenderService {
     private final StudyCalenderValidator validator;
 
     @Transactional
-    public Long createPost(CalenderCreateRequest request) {
+    public CalenderResponse createPost(CalenderCreateRequest request) {
 
         Member member = memberService.getMember();
 
@@ -43,7 +43,7 @@ public class StudyCalenderService {
 
         studyCalenderRepository.save(calender);
 
-        return calender.getId();
+        return studyCalenderMapper.toResponse(calender);
     }
 
     public CalenderResponse findOne(Long id) {

@@ -14,6 +14,7 @@ public class PostMapper {
         return Post.builder()
                 .member(member)
                 .title(request.getTitle())
+                .likeCount(0)
                 .content(request.getContent())
                 .category(request.getCategory())
                 .interests(request.getInterests())
@@ -33,6 +34,7 @@ public class PostMapper {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
+                .likeCount(post.getLikeCount())
                 .createdAt(post.getCreatedAt()) // 날짜 포맷은 필요에 따라 변경
                 .interests(post.getInterests())
                 .recruitmentStatus(post.getRecruitmentStatus()) // 모집 여부 추가

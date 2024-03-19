@@ -1,11 +1,14 @@
 package com.studymate.backend.post.domain;
 
 import com.studymate.backend.global.BaseTimeEntity;
+import com.studymate.backend.heart.domain.Heart;
 import com.studymate.backend.member.domain.Category;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Entity
@@ -23,6 +26,9 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name="user_id",updatable = false)
     private Member member;
 
+    @OneToMany(mappedBy = "post")
+    private List<Heart> heart;
+
     @Column(length = 30)
     private String title;
 
@@ -33,6 +39,8 @@ public class Post extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Interests interests;
+
+    private Integer likeCount;
 
     private Boolean recruitmentStatus;
 
