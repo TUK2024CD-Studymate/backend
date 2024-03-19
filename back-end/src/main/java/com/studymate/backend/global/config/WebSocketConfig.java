@@ -26,10 +26,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         //.withSockJS()
     }
 
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
         registry.enableSimpleBroker("/sub");
+//        registry.enableSimpleBroker("/topic", "/queue");
 
         registry.setApplicationDestinationPrefixes("/pub");
     }
@@ -38,4 +40,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(stompHandler);
     }
+
+
 }

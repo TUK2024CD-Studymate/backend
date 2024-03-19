@@ -1,27 +1,23 @@
 package com.studymate.backend.chat.domain;
 
-import com.studymate.backend.global.BaseTimeEntity;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.Random;
 
 @Getter
-@Builder
-@Entity
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoom extends BaseTimeEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_room_id")
-    private Long id;
-
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private final List<ChatMessage> chatMessageList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "chatRoom", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private final List<UserChatRoom> userChatRoomList = new ArrayList<>();
+@Setter
+public class ChatRoom {
+    private String roomId;
+    private String name;
+    public static ChatRoom create(String name) {
+        ChatRoom chatRoom = new ChatRoom();
+        // 0에서 9999 사이의 랜덤 정수 생성
+        int randomNumber = new Random().nextInt(10000);
+        // 랜덤 정수를 문자열로 변환하며, 필요한 경우 앞에 0을 붙여 4자리수를 유지
+        chatRoom.roomId = String.format("%04d", randomNumber);
+        chatRoom.name = name;
+        return chatRoom;
+    }
 }
