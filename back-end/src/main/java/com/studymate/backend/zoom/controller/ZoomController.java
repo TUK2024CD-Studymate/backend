@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ZoomController {
     private final ZoomService zoomService;
