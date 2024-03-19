@@ -33,6 +33,7 @@ public class ChatController {
         // Perform the actual sending of the message
         messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
 
+
         // Log after attempting to send the message
         log.info("# Message sent to /sub/chat/room/{}", message.getRoomId());
     }
