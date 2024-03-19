@@ -12,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/api/chat")
+@Tag(name = "채팅", description = "채팅 API")
 public class ChatRoomController {
 
     private final ChatRoomRepository chatRoomRepository;
@@ -22,12 +23,16 @@ public class ChatRoomController {
     }
 
     @GetMapping("/rooms")
+    @Operation(summary = "채팅방 리스트 조회", description = "회원이 채팅방리스트를 조회한다")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     @ResponseBody
     public List<ChatRoom> room() {
         return chatRoomRepository.findAllRoom();
     }
 
     @PostMapping("/room")
+    @Operation(summary = "채팅방 생성", description = "회원이 채팅방을 생성한다")
+    @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     @ResponseBody
     public ChatRoom createRoom(@RequestParam String name) {
         return chatRoomRepository.createChatRoom(name);
@@ -41,6 +46,8 @@ public class ChatRoomController {
 
 
     @GetMapping("/room/{roomId}")
+    @Operation(summary = "채팅방 조회", description = "회원이 채팅방을 조회한다")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     @ResponseBody
     public ChatRoom roomInfo(@PathVariable Integer roomId) {
         return chatRoomRepository.findRoomById(roomId);
