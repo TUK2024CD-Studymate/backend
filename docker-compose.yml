@@ -26,7 +26,7 @@ services:
       - study_mate
 
   back-end:
-    build: .
+    build: back-end
     container_name: study-mate
     restart: always
     depends_on:
