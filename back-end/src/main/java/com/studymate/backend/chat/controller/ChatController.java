@@ -17,7 +17,7 @@ public class ChatController {
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
-    @MessageMapping("/chat/message")
+    @MessageMapping("/chat/message/{roomId}")
     @SendToUser("/sub/chat/room/{roomID}")
     public void message(ChatMessage message) {
         log.info("# roomId = {}", message.getRoomId());
