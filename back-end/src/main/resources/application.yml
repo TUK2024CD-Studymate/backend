@@ -42,12 +42,14 @@ spring:
     multipart:
       maxFileSize: 10MB
       maxRequestSize: 30MB
+
   data:
     redis:
       host: redis
       port: 6379
       ssl:
         enabled: true
+
 logging:
   level:
     org.hibernate.SQL: debug;
