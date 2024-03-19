@@ -39,6 +39,7 @@ public class ChatRoomController {
         return "/chat/roomdetail";
     }
 
+
     @GetMapping("/room/{roomId}")
     @ResponseBody
     public ChatRoom roomInfo(@PathVariable Integer roomId) {
