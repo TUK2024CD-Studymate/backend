@@ -32,4 +32,5 @@ public class ChatRoomRepository {
         chatRoomMap.put(chatRoom.getRoomId(), chatRoom);
         return chatRoom;
     }
+
 }
