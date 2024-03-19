@@ -45,7 +45,7 @@ public class MessageService {
         params.put("type", "SMS");
         params.put("app_version", "test app 1.2");
         params.put("to", to);
-        params.put("text", randomNum);
+        params.put("text", "[StudyMate] 인증번호 "+randomNum);
         return params;
     }
 
