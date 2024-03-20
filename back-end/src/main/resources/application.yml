@@ -65,6 +65,6 @@ firebase:
   scope: https://www.googleapis.com/auth/cloud-platform
 
 coolsms:
-  fromnumber: "01046666208"
+  fromnumber: "07080985380"
   apisecret: "HBCJAHWPRDXY9VAQAQFUQIRQRWROLZXX"
   apikey: "NCSXX2T6BEFTBVEK"
