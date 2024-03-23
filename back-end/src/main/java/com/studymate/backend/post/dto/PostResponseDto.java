@@ -32,4 +32,6 @@ public class PostResponseDto {
 
     private Boolean recruitmentStatus;
 
+    private Long commentCount;
+
 }
