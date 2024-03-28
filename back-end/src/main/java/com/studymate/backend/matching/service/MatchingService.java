@@ -9,6 +9,10 @@ import com.studymate.backend.member.dto.MemberListResponse;
 import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.question.QuestionRepository;
 import com.studymate.backend.question.domain.Question;
+import com.studymate.backend.review.ReviewMapper;
+import com.studymate.backend.review.ReviewRepository;
+import com.studymate.backend.review.domain.Review;
+import com.studymate.backend.review.dto.ReviewResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -27,6 +32,8 @@ public class MatchingService {
     private final QuestionRepository questionRepository;
     private final PushNotificationService pushNotificationService;
     private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewMapper reviewMapper;
 
     @Value("${coolsms.apikey}")
     private String apiKey;
@@ -103,5 +110,17 @@ public class MatchingService {
                 "[내용제목] : "+question.getTitle()+"\n[내용상세] :" +question.getContent()+ "\n" +
                 "[채팅 참여링크] : http://studymate-tuk.kro.kr/chat");
         return params;
+    }
+
+    public List<ReviewResponse> searchMentorReview(Long mentorId) {
+        Member mentor = memberRepository.findById(mentorId)
+                .orElseThrow(() -> new RuntimeException("not found mentor id"));
+
+        List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
+
+        List<ReviewResponse> reviewResponses = reviews.stream().map(reviewMapper::toResponse)
+                .toList();
+
+        return reviewResponses;
     }
 }
