@@ -100,6 +100,10 @@ public class Member extends BaseTimeEntity{
         this.heart++;
     }
 
+    public void setStarNum(int star) {
+        this.star += star;
+    }
+
     public void updateReviewCount() {
         this.reviewCount++;
     }
@@ -114,4 +118,15 @@ public class Member extends BaseTimeEntity{
     public void subSolved() {
         this.solved--;
     }
+
+    public void subHeart() {
+        this.heart--;
+    }
+
+    public void updateStarNum(int star, int updateStar) {
+        this.star -= star;
+        this.star += updateStar;
+    }
+
+
 }
