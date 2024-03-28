@@ -2,8 +2,6 @@ package com.studymate.backend.member.service;
 
 import com.studymate.backend.commons.firebase.FCMTokenManager;
 import com.studymate.backend.config.security.SecurityUtil;
-import com.studymate.backend.file.ProfileImgRepository;
-import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
@@ -12,6 +10,8 @@ import com.studymate.backend.member.domain.Part;
 import com.studymate.backend.member.dto.*;
 import com.studymate.backend.member.exception.DuplicateMemberException;
 import com.studymate.backend.member.exception.NotFoundMemberException;
+import com.studymate.backend.review.domain.Review;
+import com.studymate.backend.review.dto.ReviewUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,5 +91,38 @@ public class MemberService {
      */
     private void deleteAndSaveFCMToken(String fcmToken, Long userId) {
         fcmTokenManager.deleteAndSaveFCMToken(String.valueOf(userId),fcmToken);
+    }
+
+    @Transactional
+    public void setMentorInfoByReview(Review review, Member mentor) {
+
+        if (review.getIsSolved()) {
+            mentor.updateSolved();
+        }
+        if (review.getHeart()) {
+            mentor.updateHeart();
+        }
+        mentor.updateReviewCount();
+        mentor.updateMatchingCount();
+        mentor.setStarNum(review.getStar());
+        mentor.setStarAverage(mentor.getReviewCount());
+    }
+
+    @Transactional
+    public void updateMentorInfoByReview(Review review, Member mentor, ReviewUpdateRequest request) {
+        if (review.getIsSolved() && !request.getIsSolved()) {
+            mentor.subSolved();
+        }
+        if (!review.getIsSolved() && request.getIsSolved()) {
+            mentor.updateSolved();
+        }
+        if (review.getHeart() && !request.getHeart()) {
+            mentor.subHeart();
+        }
+        if (!review.getHeart() && request.getHeart()) {
+            mentor.updateHeart();
+        }
+        mentor.updateStarNum(review.getStar(), request.getStar());
+        mentor.setStarAverage(mentor.getReviewCount());
     }
 }
