@@ -10,6 +10,7 @@ import com.studymate.backend.zoom.service.ZoomService;
 import com.studymate.backend.zoom.util.DecEncUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ZoomController {
     private final ZoomService zoomService;
     private final ZoomTokenRepository zoomTokenRepository;
@@ -62,6 +64,7 @@ public class ZoomController {
         String accessToken = list.get("access_token");
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
+        log.info("accessToken:{}", accessToken);
         return "zoomLogin";
     }
 
