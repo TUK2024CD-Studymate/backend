@@ -19,5 +19,4 @@ public class MemberLoginRequest {
     @NotBlank
     @Schema(description = "사용자 비밀번호", nullable = false, example = "asdf1020")
     private String password;
-    private String fcmToken;
 }
