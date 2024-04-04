@@ -2,6 +2,7 @@ package com.studymate.backend.matching.controller;
 
 import com.studymate.backend.matching.service.MatchingService;
 import com.studymate.backend.member.dto.MemberListResponse;
+import com.studymate.backend.member.dto.MemberResponse;
 import com.studymate.backend.review.dto.ReviewResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,5 +42,12 @@ public class MatchingController {
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<ReviewResponse>> matching(@PathVariable("mentorId") Long mentorId) {
         return ResponseEntity.ok().body(matchingService.searchMentorReview(mentorId));
+    }
+
+    @GetMapping("/matching/keyword/{question-id}")
+    @Operation(summary = "멘토 조회(KMP)", description = "KMP알고리즘을 사용해서 멘토들을 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<MemberResponse>> getMentorKeyword(@PathVariable("question-id") Long questionId) {
+        return ResponseEntity.ok().body(matchingService.getMentorListByKeyword(questionId));
     }
 }
