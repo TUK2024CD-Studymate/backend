@@ -20,6 +20,7 @@ public class Question extends BaseTimeEntity {
     private String writer;
     private String title;
     private String content;
+    private String specificField;
     @Enumerated(value = EnumType.STRING)
     private Interests interests;
     @ColumnDefault("FALSE")

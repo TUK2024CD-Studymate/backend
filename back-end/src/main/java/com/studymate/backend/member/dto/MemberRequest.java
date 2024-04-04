@@ -34,6 +34,9 @@ public class MemberRequest {
     @NotNull
     @Schema(description = "사용자 멘토,멘티 여부", nullable = false, example = "MENTOR")
     private Part part;
+    @NotBlank
+    @Schema(description = "사용자 상세분야", nullable = false, example = "백엔드 JPA 데이터베이스 보안")
+    private String expertiseField;
     @NotNull
     @Schema(description = "사용자 관심분야", nullable = false, example = "PROGRAMMING")
     private Interests interests;

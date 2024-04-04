@@ -6,6 +6,7 @@ import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.domain.Part;
 import com.studymate.backend.member.dto.MemberListResponse;
+import com.studymate.backend.member.dto.MemberResponse;
 import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.question.QuestionRepository;
 import com.studymate.backend.question.domain.Question;
@@ -21,8 +22,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -122,5 +122,124 @@ public class MatchingService {
                 .toList();
 
         return reviewResponses;
+    }
+
+    /**
+     * 1. 질문(상세분야 키워드 뽑아옴) -> "데이터베이스 JPA 스프링" (프론트에서 분리단위 공백으로 구분)
+     * 2. 일단 질문 분야와 같은 멘토 불러옴
+     * 3.1. 서버에서 받아온 상세분야 " " 기준으로 슬라이싱 처리 후 컬렉션에 저장
+     * 3.2. 저장된 컬렉션 인덱스 길이만큼 반복문 실행
+     * 3.3. 문자열이 일치하다고 판단(KMP)되면 저장변수에 + 1
+     * 4. 모든 검색을 마친 후 가장 높은 점수를 받은 멘토 들을 내림차순으로 출력.
+     */
+    public List<MemberResponse> getMentorListByKeyword(Long questionId) {
+        //1
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("not found question id"));
+
+        String specificField = question.getSpecificField();
+
+        //2
+        MemberListResponse listResponses = getMentorList(questionId);
+        List<MemberResponse> mentorList = listResponses.getMemberList();
+
+        //3.1
+        String[] tokens = specificField.split("\\s+");
+        List<String> field = new ArrayList<>();
+        Collections.addAll(field, tokens);
+
+        //3.2 ~ 3.3
+        Map<MemberResponse, Integer> matchingCountsByPR = new HashMap<>();
+        Map<MemberResponse, Integer> matchingCountsByExField = new HashMap<>();
+
+        List<MemberResponse> result = new ArrayList<>();
+        for (MemberResponse mentor : mentorList) {
+            int matchingCountByPR = 0;
+            int matchingCountByExField = 0;
+
+            for (String s : field) {
+                if (KMPSearch(mentor.getPublicRelations(), s)) {
+                    matchingCountByPR++;
+                    log.info("matchingToken: {}", s);
+                    log.info("mentorsPR: {}", mentor.getPublicRelations());
+                }
+                if (KMPSearch(mentor.getExpertiseField(), s)) {
+                    matchingCountByExField++;
+                    log.info("matchingToken: {}", s);
+                    log.info("mentorsExField: {}", mentor.getExpertiseField());
+                }
+            }
+            if (matchingCountByPR > 0) {
+                matchingCountsByPR.put(mentor, matchingCountByPR);
+            }
+            if (matchingCountByExField > 0) {
+                matchingCountsByExField.put(mentor, matchingCountByPR);
+            }
+            if (matchingCountByPR > 0 || matchingCountByExField > 0) {
+                log.info("mentor:{}", mentor.getNickname());
+                log.info("mentorsPRCount:{}", matchingCountByPR);
+                log.info("mentorsExCount:{}", matchingCountByExField);
+                log.info("SUM:{}", matchingCountByPR + matchingCountByExField);
+                result.add(mentor);
+            }
+        }
+
+        //4
+        result.sort((a, b) -> {
+            int aValue = matchingCountsByPR.getOrDefault(a, 0) + matchingCountsByExField.getOrDefault(a, 0);
+            int bValue = matchingCountsByPR.getOrDefault(b, 0) + matchingCountsByExField.getOrDefault(b, 0);
+            return Integer.compare(bValue, aValue);
+        });
+
+        if (result.isEmpty()) {
+            mentorList.sort(Comparator.comparingInt(MemberResponse::getHeart).reversed());
+            result.addAll(mentorList.subList(0, Math.min(5, mentorList.size())));
+        }
+
+        return result;
+    }
+
+    private static boolean KMPSearch(String text, String pattern) {
+        int[] lps = computeLPSArray(pattern);
+        int i = 0;  // text의 인덱스
+        int j = 0;  // pattern의 인덱스
+
+        while (i < text.length()) {
+            if (pattern.charAt(j) == text.charAt(i)) {
+                i++;
+                j++;
+            }
+            if (j == pattern.length()) {
+                return true; // 패턴 발견
+            } else if (i < text.length() && pattern.charAt(j) != text.charAt(i)) {
+                if (j != 0)
+                    j = lps[j - 1];
+                else
+                    i = i + 1;
+            }
+        }
+        return false; // 패턴 미발견
+    }
+
+    private static int[] computeLPSArray(String pattern) {
+        int[] lps = new int[pattern.length()];
+        int len = 0;
+        int i = 1;
+
+        while (i < pattern.length()) {
+            if (pattern.charAt(i) == pattern.charAt(len)) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i] = len;
+                    i++;
+                }
+            }
+        }
+        return lps;
     }
 }
