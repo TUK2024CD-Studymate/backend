@@ -19,6 +19,7 @@ public class MemberResponse {
     private Part part;
     private String email;
     private String tel;
+    private String expertiseField;
     private Interests interests;
 //    private String imageUrl;
     private String blogUrl;
