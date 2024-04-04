@@ -42,6 +42,7 @@ public class Member extends BaseTimeEntity{
     private int reviewCount;
     @Column
     private int heart;
+    private String expertiseField;
     @Column
     private String publicRelations;
     @Column
@@ -84,6 +85,7 @@ public class Member extends BaseTimeEntity{
 
     public void update(MemberUpdateRequest request) {
         this.name = request.getName();
+        this.expertiseField = request.getExpertiseField();
         this.part = request.getPart();
         this.interests = request.getInterests();
         this.nickname = request.getNickname();
