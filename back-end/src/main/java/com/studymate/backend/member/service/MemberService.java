@@ -2,6 +2,7 @@ package com.studymate.backend.member.service;
 
 import com.studymate.backend.commons.firebase.FCMTokenManager;
 import com.studymate.backend.config.security.SecurityUtil;
+import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
@@ -13,10 +14,13 @@ import com.studymate.backend.member.exception.NotFoundMemberException;
 import com.studymate.backend.review.domain.Review;
 import com.studymate.backend.review.dto.ReviewUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -24,9 +28,11 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-    private final FCMTokenManager fcmTokenManager;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
 
     @Transactional
+
     public String signup(MemberRequest request) {
         if (memberRepository.findOneWithAuthoritiesByEmail(request.getEmail()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 회원입니다.");
@@ -36,6 +42,23 @@ public class MemberService {
         memberRepository.save(member);
 
         return "회원가입이 완료되었습니다.";
+    }
+
+    @Transactional
+    public void logout(TokenRequestDto tokenRequestDto) {
+        if (!tokenProvider.validateToken(tokenRequestDto.getAccessToken())) {
+            throw new IllegalArgumentException("로그아웃 : 유효하지 않은 토큰입니다.");
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
+
+        if (redisTemplate.opsForValue().get(authentication.getName()) != null) {
+            redisTemplate.delete(authentication.getName());
+        }
+
+
+        Long expiration = tokenProvider.getExpiration(tokenRequestDto.getAccessToken());
+        redisTemplate.opsForValue().set(tokenRequestDto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
     @Transactional(readOnly = true)
@@ -73,24 +96,10 @@ public class MemberService {
 
         return member;
     }
+
     public MemberListResponse findMentorByInterest(Interests interests) {
         List<Member> memberList = memberRepository.findAllByInterestsAndPart(interests, Part.MENTOR);
         return memberMapper.toListResponse(memberList);
-    }
-
-    public void fcmLogin(MemberLoginRequest request) {
-        final String fcmToken = request.getFcmToken();
-        Member member = memberRepository.findByEmail(request.getEmail());
-        final Long memberId = member.getId();
-        deleteAndSaveFCMToken(fcmToken, memberId);
-    }
-
-    /*
-     * 기존에 존재하는 Fcm토큰을 삭제한다.
-     * Redis에 사용자 아이디를 Key로 Fcm토큰을 저장한다.
-     */
-    private void deleteAndSaveFCMToken(String fcmToken, Long userId) {
-        fcmTokenManager.deleteAndSaveFCMToken(String.valueOf(userId),fcmToken);
     }
 
     @Transactional
