@@ -21,6 +21,7 @@ public class QuestionResponse {
     private String writer;
     private String title;
     private String content;
+    private String specificField;
     private Interests interests;
     private Boolean isSolved;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -34,6 +35,7 @@ public class QuestionResponse {
                 .content(question.getContent())
                 .interests(question.getInterests())
                 .createAt(question.getCreatedAt())
+                .specificField(question.getSpecificField())
                 .isSolved(question.getIsSolved())
                 .build();
     }
