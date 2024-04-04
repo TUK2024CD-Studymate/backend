@@ -27,6 +27,9 @@ public class MemberUpdateRequest {
     @Schema(description = "사용자가 바꿀 관심분야", nullable = false, example = "ENGLISH")
     private Interests interests;
     @NotBlank
+    @Schema(description = "사용자 바꿀 상세분야", nullable = false, example = "백엔드 JPA 자바")
+    private String expertiseField;
+    @NotBlank
     @Schema(description = "사용자가 바꿀 닉네임", nullable = false, example = "영환영어")
     private String nickname;
     @Schema(description = "사용자의 블로그URL", nullable = true, example = "https://hothoony.tistory.com/890")
