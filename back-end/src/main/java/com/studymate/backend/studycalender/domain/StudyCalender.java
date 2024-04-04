@@ -36,7 +36,7 @@ public class StudyCalender extends BaseTimeEntity {
 
     private LocalTime entireTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
