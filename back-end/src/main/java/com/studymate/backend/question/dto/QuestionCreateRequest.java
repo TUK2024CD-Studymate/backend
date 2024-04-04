@@ -22,16 +22,20 @@ public class QuestionCreateRequest {
     @NotBlank
     @Schema(description = "질문 내용", nullable = false, example = "mysql이랑 스프링 연동이 안됩니다..")
     private String content;
+    @NotBlank
+    @Schema(description = "상세 질문 분야", nullable = false, example = "백앤드 JPA MySQL 데이터베이스 스프링")
+    private String specificField;
     @NotNull
     @Schema(description = "질문 주제", nullable = false, example = "PROGRAMMING")
     private Interests interests;
-
     public Question toEntity(QuestionCreateRequest request) {
         return Question.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
                 .interests(request.getInterests())
+                .specificField(request.getSpecificField())
                 .isSolved(false)
                 .build();
     }
+
 }
