@@ -1,5 +1,6 @@
 package com.studymate.backend.heart.controller;
 
+import com.studymate.backend.heart.dto.HeartResponse;
 import com.studymate.backend.heart.service.HeartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,14 +20,14 @@ public class HeartController {
     @PostMapping("/post/heart/{postId}")
     @Operation(summary = "좋아요", description = "회원이 좋아요를 누른다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> insert(@PathVariable("postId") Long id) throws Exception{
+    public ResponseEntity<HeartResponse> insert(@PathVariable("postId") Long id) throws Exception{
         return ResponseEntity.ok().body(heartService.insert(id));
     }
 
     @DeleteMapping("/post/heart/{postId}")
     @Operation(summary = "좋아요 취소", description = "회원이 좋아요를 취소한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> delete(@PathVariable("postId") Long id) throws Exception{
+    public ResponseEntity<HeartResponse> delete(@PathVariable("postId") Long id) throws Exception{
         return ResponseEntity.ok().body(heartService.delete(id));
     }
 }
