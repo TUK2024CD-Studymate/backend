@@ -1,7 +1,9 @@
 package com.studymate.backend.heart.service;
 
+import com.studymate.backend.heart.HeartMapper;
 import com.studymate.backend.heart.HeartRepository;
 import com.studymate.backend.heart.domain.Heart;
+import com.studymate.backend.heart.dto.HeartResponse;
 import com.studymate.backend.heart.dto.LikeSseResponse;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.service.MemberService;
@@ -23,9 +25,10 @@ public class HeartService {
     private final PostRepository postRepository;
     private final MemberService memberService;
     private final NotificationService notificationService;
+    private final HeartMapper heartMapper;
 
     @Transactional
-    public String insert(Long id) throws Exception {
+    public HeartResponse insert(Long id) throws Exception {
         Member member = memberService.getMember();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -51,11 +54,12 @@ public class HeartService {
         // 게시물 작성자에게 구체적인 알림 데이터 보내기
         notificationService.customNotify(post.getMember().getId(), likeSseResponse, "작성하신 게시글에 좋아요가 달렸습니다.", "Like");
 
-        return "좋아요를 눌렀습니다.";
+        HeartResponse response = heartMapper.toResponse(heart);
+        return response;
     }
 
     @Transactional
-    public String delete(Long id) {
+    public HeartResponse delete(Long id) {
         Member member = memberService.getMember();
 
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("not found id"));
@@ -63,9 +67,11 @@ public class HeartService {
         Heart heart = heartRepository.findByMemberAndPost(member, post)
                 .orElseThrow(() -> new RuntimeException("not found heart"));
 
+        HeartResponse response = heartMapper.toResponse(heart);
+
         heartRepository.delete(heart);
         postRepository.subLikeCount(post);
 
-        return "좋아요를 취소했습니다.";
+        return response;
     }
 }
