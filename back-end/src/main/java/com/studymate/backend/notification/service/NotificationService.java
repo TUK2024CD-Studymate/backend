@@ -3,8 +3,9 @@ package com.studymate.backend.notification.service;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.notification.repository.EmitterRepository;
-import com.studymate.backend.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -16,8 +17,7 @@ public class NotificationService {
 
     private final MemberRepository memberRepository;
     private final EmitterRepository emitterRepository;
-    private final PostRepository postRepository;
-
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
 
@@ -29,7 +29,15 @@ public class NotificationService {
     }
 
     public <T> void customNotify(Long userId, T data, String comment, String type) {
-        sendToClient(userId, data, comment, type);
+        try{
+            sendToClient(userId, data, comment, type);
+            logger.info("Successfully sent notification");
+        }
+        catch (Exception e){
+            logger.error("Failed to send notification");
+        }
+
+
     }
     public void notify(Long userId, Object data, String comment) {
         sendToClient(userId, data, comment);
