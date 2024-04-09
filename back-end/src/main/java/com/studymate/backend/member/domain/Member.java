@@ -1,13 +1,16 @@
 package com.studymate.backend.member.domain;
 
-import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.global.BaseTimeEntity;
 import com.studymate.backend.member.dto.MemberUpdateRequest;
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,14 +42,17 @@ public class Member extends BaseTimeEntity{
     private int reviewCount;
     @Column
     private int heart;
+    private String expertiseField;
     @Column
     private String publicRelations;
     @Column
     private String job;
     @Column
     private int star;
-    @Column
-    private double starAverage;
+    @Column(precision = 5, scale = 2)
+    @DecimalMax(value = "5")
+    @DecimalMin(value = "0")
+    private BigDecimal starAverage;
     @Column
     private String name;
     @Enumerated(value = EnumType.STRING)
@@ -79,6 +85,7 @@ public class Member extends BaseTimeEntity{
 
     public void update(MemberUpdateRequest request) {
         this.name = request.getName();
+        this.expertiseField = request.getExpertiseField();
         this.part = request.getPart();
         this.interests = request.getInterests();
         this.nickname = request.getNickname();
@@ -95,6 +102,10 @@ public class Member extends BaseTimeEntity{
         this.heart++;
     }
 
+    public void setStarNum(int star) {
+        this.star += star;
+    }
+
     public void updateReviewCount() {
         this.reviewCount++;
     }
@@ -103,6 +114,21 @@ public class Member extends BaseTimeEntity{
         this.matchingCount++;
     }
     public void setStarAverage(int reviewCount) {
-        this.starAverage = (double) this.star / reviewCount;
+        this.starAverage = BigDecimal.valueOf(this.star).divide(BigDecimal.valueOf(reviewCount),2, RoundingMode.HALF_UP);
     }
+
+    public void subSolved() {
+        this.solved--;
+    }
+
+    public void subHeart() {
+        this.heart--;
+    }
+
+    public void updateStarNum(int star, int updateStar) {
+        this.star -= star;
+        this.star += updateStar;
+    }
+
+
 }

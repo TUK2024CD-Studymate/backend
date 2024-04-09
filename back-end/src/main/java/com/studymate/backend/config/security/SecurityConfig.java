@@ -6,6 +6,7 @@ import com.studymate.backend.config.security.jwt.JwtSecurityConfig;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,15 +27,19 @@ public class SecurityConfig {
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final RedisTemplate<String,String> redisTemplate;
 
     public SecurityConfig(TokenProvider tokenProvider,
                           CorsFilter corsFilter,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler,
+                          RedisTemplate<String, String> redisTemplate) {
+
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.redisTemplate = redisTemplate;
     }
 
     @Bean
@@ -54,13 +59,14 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                                .requestMatchers("/api/signIn/**", "api/login/**").permitAll()
-                                .requestMatchers("/api/meeting/**").permitAll()
-                                .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/ws/**").permitAll()
-                                .requestMatchers("/api/chat/**").permitAll()
-                                .requestMatchers("/subscribe/**").permitAll()
-                                .anyRequest().authenticated()
+                        .requestMatchers("/api/signIn/**", "api/login/**").permitAll()
+                        .requestMatchers("/api/meeting/**").permitAll()
+                        .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/logout").permitAll()
+                        .requestMatchers("/subscribe/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -69,7 +75,7 @@ public class SecurityConfig {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
 
-                .with(new JwtSecurityConfig(tokenProvider), customizer -> {
+                .with(new JwtSecurityConfig(tokenProvider, redisTemplate), customizer -> {
                 });
         return http.build();
     }

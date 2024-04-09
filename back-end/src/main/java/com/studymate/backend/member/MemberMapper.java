@@ -1,7 +1,6 @@
 package com.studymate.backend.member;
 
 import com.studymate.backend.file.ProfileImgRepository;
-import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.domain.Authority;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.dto.MemberListResponse;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,13 +37,14 @@ public class MemberMapper {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .activated(true)
                 .isDeleted(false)
+                .expertiseField(request.getExpertiseField())
                 .tel(request.getTel())
                 .job(request.getJob())
                 .blogUrl(request.getBlogUrl())
                 .heart(0)
                 .star(0)
                 .solved(0)
-                .starAverage(0.0)
+                .starAverage(BigDecimal.valueOf(0))
                 .matchingCount(0)
                 .publicRelations(request.getPublicRelations())
                 .authorities(Collections.singleton(authority))
@@ -68,6 +69,7 @@ public class MemberMapper {
 //                .imageUrl(imageName)
                 .name(member.getName())
                 .blogUrl(member.getBlogUrl())
+                .expertiseField(member.getExpertiseField())
                 .tel(member.getTel())
                 .publicRelations(member.getPublicRelations())
                 .job(member.getJob())

@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api")
@@ -36,6 +37,7 @@ public class MemberController {
     private final MemberService memberService;
     private final PostService postService;
     private final FCMTokenManager fcmTokenManager;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @PostMapping("/signIn")
     @Operation(summary = "회원가입", description = "회원이 회원가입을 한다.")
@@ -47,7 +49,7 @@ public class MemberController {
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "회원이 로그인을 한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<TokenDto> authorizeWhitFCM(@Valid @RequestBody MemberLoginRequest request) {
+    public ResponseEntity<TokenResponseDto> authorizeWhitFCM(@Valid @RequestBody MemberLoginRequest request) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
@@ -55,14 +57,30 @@ public class MemberController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        TokenResponseDto token = tokenProvider.createToken(authentication);
+        String jwt = token.getAccessToken();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
-        memberService.fcmLogin(request);
+        redisTemplate.opsForValue().set(authentication.getName(), token.getRefreshToken(),
+                token.getRefreshTokenValidationTime(), TimeUnit.MICROSECONDS);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+
+        return ResponseEntity.ok().body(token);
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "회원이 로그아웃을 한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<String> logout(@RequestBody TokenRequestDto request) {
+        memberService.logout(request);
+        return ResponseEntity.ok().body("로그아웃 완료");
+    }
+
+    @GetMapping("member/test/fcm/{userId}")
+    public ResponseEntity<?> getFcmToken(@PathVariable("userId") Long id) {
+        return ResponseEntity.ok().body(fcmTokenManager.getToken(String.valueOf(id)));
     }
 
     @GetMapping("/user")

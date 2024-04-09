@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 
 @AllArgsConstructor
 @Builder
@@ -17,13 +19,14 @@ public class MemberResponse {
     private Part part;
     private String email;
     private String tel;
+    private String expertiseField;
     private Interests interests;
 //    private String imageUrl;
     private String blogUrl;
     private String publicRelations;
     private String job;
     private int heart;
-    private double starAverage;
+    private BigDecimal starAverage;
     private int solved;
     private int matchingCount;
 }

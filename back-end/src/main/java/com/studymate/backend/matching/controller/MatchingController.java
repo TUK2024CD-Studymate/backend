@@ -2,6 +2,8 @@ package com.studymate.backend.matching.controller;
 
 import com.studymate.backend.matching.service.MatchingService;
 import com.studymate.backend.member.dto.MemberListResponse;
+import com.studymate.backend.member.dto.MemberResponse;
+import com.studymate.backend.review.dto.ReviewResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -31,5 +35,19 @@ public class MatchingController {
     public ResponseEntity<String> matching(@PathVariable("questionId") Long questionId,
                                            @PathVariable("mentorId") Long mentorId) {
         return ResponseEntity.ok().body(matchingService.matchingForSms(questionId, mentorId));
+    }
+
+    @GetMapping("/matching/review/{mentorId}")
+    @Operation(summary = "멘토의 리뷰들 조회", description = "해당 멘토에게 쓰여진 리뷰들을 불러온다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<ReviewResponse>> matching(@PathVariable("mentorId") Long mentorId) {
+        return ResponseEntity.ok().body(matchingService.searchMentorReview(mentorId));
+    }
+
+    @GetMapping("/matching/keyword/{question-id}")
+    @Operation(summary = "멘토 조회(KMP)", description = "KMP알고리즘을 사용해서 멘토들을 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<List<MemberResponse>> getMentorKeyword(@PathVariable("question-id") Long questionId) {
+        return ResponseEntity.ok().body(matchingService.getMentorListByKeyword(questionId));
     }
 }
