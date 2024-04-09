@@ -44,7 +44,7 @@ public class HeartService {
         // 구체적인 알림 데이터 생성
         LikeSseResponse likeSseResponse = LikeSseResponse.builder()
                 .nickname(member.getNickname()) // 사용자 닉네임
-                .post_id(id) // 리뷰 또는 게시물 ID
+                .post_id(id) // 게시물 ID
                 .likedTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(formatter))
                 .build();
 
