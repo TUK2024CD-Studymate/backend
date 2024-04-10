@@ -75,6 +75,7 @@ public class MemberMapper {
                 .job(member.getJob())
                 .heart(member.getHeart())
                 .starAverage(member.getStarAverage())
+                .reviewCount(member.getReviewCount())
                 .solved(member.getSolved())
                 .matchingCount(member.getMatchingCount())
                 .build();
