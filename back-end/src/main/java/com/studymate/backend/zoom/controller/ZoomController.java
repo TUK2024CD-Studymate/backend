@@ -33,7 +33,7 @@ public class ZoomController {
 
     @RequestMapping(value = "/api/meeting/zoomApi", method = {RequestMethod.GET
             , RequestMethod.POST})
-    public ResponseEntity<?> googleAsync(HttpServletRequest req,
+    public String googleAsync(HttpServletRequest req,
                                          @RequestParam(required = false) String code) throws
             IOException, NoSuchAlgorithmException {
 
@@ -67,8 +67,7 @@ public class ZoomController {
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
         log.info("accessToken:{}", accessToken);
-//        return "zoomLogin";
-        return ResponseEntity.ok().body(list);
+        return "zoomLogin";
     }
 
     @GetMapping("/api/get/token")
