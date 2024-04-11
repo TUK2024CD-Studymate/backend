@@ -26,6 +26,8 @@ services:
       - study_mate
 
   back-end:
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: Dockerfile.dev
