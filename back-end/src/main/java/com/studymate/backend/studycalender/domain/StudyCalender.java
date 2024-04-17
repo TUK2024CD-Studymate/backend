@@ -49,16 +49,17 @@ public class StudyCalender extends BaseTimeEntity {
         this.endTime = endTime;
     }
 
-    public long convertMinutes(LocalDateTime startTime, LocalDateTime endTime) {
+    public long convertSeconds(LocalDateTime startTime, LocalDateTime endTime) {
         Duration time = Duration.between(startTime, endTime);
-        return time.toMinutes();
+        return time.toSeconds();
     }
 
     public void setEntireTime(long time) {
-        Duration duration = Duration.ofMinutes(time);
+        Duration duration = Duration.ofSeconds(time);
         long hours = duration.toHours();
         int minutes = duration.toMinutesPart();
-        this.entireTime = LocalTime.of((int) hours, minutes);
+        int seconds = duration.toSecondsPart();
+        this.entireTime = LocalTime.of((int) hours, minutes,seconds);
     }
 
     public String serializeTime(LocalTime time) {
