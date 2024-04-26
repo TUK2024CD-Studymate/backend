@@ -1,21 +1,21 @@
 version: '3.8'
 
 services:
-  db:
-    image: mariadb
-    container_name: mariadb
-    restart: always
-    environment:
-      MARIADB_DATABASE: ${MARIADB}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
-    ports:
-      - "3307:3306"
-    volumes:
-      - mariadb_data:/var/lib/mariadb
-    networks:
-      - study_mate
+#  db:
+#    image: mariadb
+#    container_name: mariadb
+#    restart: always
+#    environment:
+#      MARIADB_DATABASE: ${MARIADB}
+#      MARIADB_USER: ${MARIADB_USER}
+#      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+#      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - mariadb_data:/var/lib/mariadb
+#    networks:
+#      - study_mate
   redis:
     container_name: redis
     image: redis
