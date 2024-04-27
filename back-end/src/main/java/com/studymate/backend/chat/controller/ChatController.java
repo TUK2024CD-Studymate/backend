@@ -1,50 +1,81 @@
 package com.studymate.backend.chat.controller;
 
-import com.studymate.backend.chat.domain.ChatMessage;
+import com.studymate.backend.chat.domain.ChatRoom;
+import com.studymate.backend.chat.domain.UserChatRoom;
+import com.studymate.backend.chat.dto.ChatMessageRes;
+import com.studymate.backend.chat.dto.ChatRoomRes;
+import com.studymate.backend.chat.service.ChatService;
+import com.studymate.backend.config.security.jwt.TokenProvider;
+import com.studymate.backend.member.MemberRepository;
+import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.member.domain.UserDetail;
+import com.studymate.backend.member.service.CustomUserDetailsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
 
-@Slf4j
-@RequiredArgsConstructor
-@Controller
+import java.util.List;
+
+@Tag(name = "Chat", description = "채팅 API")
+@RestController
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequestMapping("api/chat/rooms")
 public class ChatController {
+    private final ChatService chatService;
+    private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
 
-    @Autowired
-    private SimpMessageSendingOperations messagingTemplate;
-
-    @MessageMapping("/chat/message/{roomId}")
-    @SendToUser("/sub/chat/room/{roomID}")
-    public void message(ChatMessage message) {
-        log.info("# roomId = {}", message.getRoomId());
-        if (ChatMessage.MessageType.ENTER.equals(message.getType())){
-            message.setMessage(message.getSender() + "님이 입장하셨습니다.");
+    @Operation(summary = "chatroom create", description = "채팅방 생성")
+    @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
+    @PostMapping
+    public ResponseEntity<?> createChatRoom(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: No token provided");
         }
-        // Log what message will be sent
-        log.info("# Sending message to /sub/chat/room/{}: {}", message.getRoomId(), message);
+        String token = authHeader.substring(7);
+        Authentication authentication = tokenProvider.getAuthentication(token);
 
-        // Perform the actual sending of the message
-        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid token");
+        }
 
+        User principal = (User) authentication.getPrincipal();
+        String email = principal.getUsername(); // JWT에서 추출된 사용자 이메일을 가져옵니다.
 
-        // Log after attempting to send the message
-        log.info("# Message sent to /sub/chat/room/{}", message.getRoomId());
+        // 여기에서 데이터베이스에서 Member를 조회하거나 채팅방 생성 로직을 수행
+        // 예시로, Member 객체의 이메일 필드를 사용하여 DB에서 조회
+        Member member = memberRepository.findByEmail(email);
+
+        if (chatService.duplicatedUserChatRoom(member)) {
+            UserChatRoom userChatRoom = chatService.findUserChatRoomByMemberId(member.getId());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이미 채팅방이 존재합니다.");
+        }
+
+        ChatRoom chatRoom = chatService.createChatRoom();
+        chatService.createUserChatRoom(member, chatRoom.getId());
+        ChatRoomRes chatRoomRes = ChatRoomRes.builder()
+                .chatRoomId(chatRoom.getId())
+                .nickname(member.getNickname())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomRes);
     }
-//    @MessageMapping("/chat/{roomID}")
-//    @SendToUser("/topic/chat/room/{roomID}") // 메서드가 반환하는 객체를 지정된 대상으로 전송
-//    public ChatMessage message(@DestinationVariable String roomID, ChatMessage message) {
-//        log.info("# roomId = {}", roomID);
-//        if (ChatMessage.MessageType.ENTER.equals(message.getType())){
-//            message.setMessage(message.getSender() + "님이 입장하셨습니다.");
-//        }
-//        // Log what message will be sent
-//        log.info("# Sending message to /topic/chat/room/{}: {}", roomID, message);
-//
-//        // 반환값이 /topic/chat/room/{roomID}로 자동 전송됩니다.
-//        return message;
-//    }
+
+
+    @Operation(summary = "ChatRoomList read", description = "채팅방 목록 조회")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    @GetMapping("/list")
+    public ResponseEntity<ChatRoomRes> getChatRoomList () {
+        List<ChatRoomRes> chatRoomList = chatService.findChatRoom();
+
+        return ResponseEntity.ok((ChatRoomRes) chatRoomList);
+    }
 }
