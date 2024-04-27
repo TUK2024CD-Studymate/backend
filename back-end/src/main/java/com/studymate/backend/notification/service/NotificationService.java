@@ -36,8 +36,6 @@ public class NotificationService {
         catch (Exception e){
             logger.error("Failed to send notification");
         }
-
-
     }
     public void notify(Long userId, Object data, String comment) {
         sendToClient(userId, data, comment);
