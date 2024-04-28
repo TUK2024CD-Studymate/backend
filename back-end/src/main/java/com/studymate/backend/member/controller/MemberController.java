@@ -122,4 +122,9 @@ public class MemberController {
     public ResponseEntity<?> delete() {
         return ResponseEntity.ok(memberService.delete());
     }
+
+    @GetMapping("/healthcheck")
+    public ResponseEntity<?> healthCheck() {
+        return ResponseEntity.ok("OK");
+    }
 }
