@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/gpt/**").permitAll()
                         .requestMatchers("/api/logout").permitAll()
+                        .requestMatchers("/api/healthcheck").permitAll()
                         .requestMatchers("/subscribe/**").permitAll()
                         .anyRequest().authenticated()
                 )
