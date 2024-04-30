@@ -69,10 +69,7 @@ public class Member extends BaseTimeEntity{
     private Boolean isDeleted;
     @Column
     private boolean activated;
-
-    @Column(length = 1000)
-    private String fcmToken;
-
+    private boolean isLogin;
     @JoinTable(
             name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
@@ -100,6 +97,14 @@ public class Member extends BaseTimeEntity{
 
     public void updateHeart() {
         this.heart++;
+    }
+
+    public void logoutMemberActivated() {
+        this.isLogin = false;
+    }
+
+    public void loginMemberActivated() {
+        this.isLogin = true;
     }
 
     public void setStarNum(int star) {

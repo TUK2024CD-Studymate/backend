@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 public class MemberMapper {
 
     private final PasswordEncoder passwordEncoder;
-    private final ProfileImgRepository profileImgRepository;
-
     public Member toEntity(MemberRequest request) {
 
         Authority authority = Authority.builder().
@@ -36,6 +34,7 @@ public class MemberMapper {
                 .interests(request.getInterests())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .activated(true)
+                .isLogin(false)
                 .isDeleted(false)
                 .expertiseField(request.getExpertiseField())
                 .tel(request.getTel())
@@ -74,6 +73,7 @@ public class MemberMapper {
                 .publicRelations(member.getPublicRelations())
                 .job(member.getJob())
                 .heart(member.getHeart())
+                .isLogin(member.isLogin())
                 .starAverage(member.getStarAverage())
                 .reviewCount(member.getReviewCount())
                 .solved(member.getSolved())

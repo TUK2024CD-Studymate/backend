@@ -30,4 +30,5 @@ public class MemberResponse {
     private int solved;
     private int matchingCount;
     private int reviewCount;
+    private boolean isLogin;
 }
