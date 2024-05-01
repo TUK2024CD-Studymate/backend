@@ -1,8 +1,15 @@
 package com.studymate.backend.matching.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studymate.backend.commons.firebase.PushNotificationService;
+import com.studymate.backend.global.gpt.dto.GPTRequest;
+import com.studymate.backend.global.gpt.dto.GPTResponse;
+import com.studymate.backend.matching.dto.JsonMentorResponse;
+import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.heart.dto.LikeSseResponse;
 import com.studymate.backend.matching.dto.MatchingSseResponse;
+
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
@@ -13,6 +20,7 @@ import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.notification.service.NotificationService;
 import com.studymate.backend.question.QuestionRepository;
 import com.studymate.backend.question.domain.Question;
+import com.studymate.backend.question.dto.QuestionAiResponse;
 import com.studymate.backend.review.ReviewMapper;
 import com.studymate.backend.review.ReviewRepository;
 import com.studymate.backend.review.domain.Review;
@@ -24,33 +32,46 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MatchingService {
+    private final NotificationService notificationService;
     private final MemberService memberService;
     private final QuestionRepository questionRepository;
     private final PushNotificationService pushNotificationService;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
-    private final NotificationService notificationService;
+    private final RestTemplate restTemplate;
+    private final MemberMapper memberMapper;
+    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토를 출력해. 멘토들의 정보 : ";
+    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토를 선택 한 후에 반환해줘. 반환값의 경우 id값만 출력해 만약 id값이 2개 이상이라면 공백으로 구분해(예시로 가장 일치하는 멘토들의 id가 1,2,5 라면 반환값은 1 2 5)";
+    @Value("${openai.model}")
+    private String model;
+    @Value("${openai.api.url}")
+    private String apiURL;
+
+    
+
 
 
     @Value("${coolsms.apikey}")
     private String apiKey;
-
     @Value("${coolsms.apisecret}")
     private String apiSecret;
-
     @Value("${coolsms.fromnumber}")
     private String fromNumber;
+    private static final String pattern = "\\d+(\\s\\d+)*";
 
     public MemberListResponse getMentorList(Long questionId) {
         Member member = memberService.getMember();
@@ -259,5 +280,90 @@ public class MatchingService {
             }
         }
         return lps;
+    }
+
+    public List<MemberResponse> getMentorListByAi(Long questionId) {
+        List<MemberResponse> memberResponses = new ArrayList<>();
+        // 2
+        MemberListResponse mentorList = getMentorList(questionId);
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("not found question"));
+
+        String questionContent = question.getContent();
+
+        String mentorInfo = convertToJsonString(mentorList);
+
+        // 3
+        String message = gptConvert(questionContent, mentorInfo);
+        boolean isMatch = patternMatch(message);
+
+        log.info("content:{}",message);
+        log.info("isMatch:{}",isMatch);
+
+        // 형식 검증 로직
+        if (!isMatch) {
+            while (isMatch) {
+                message = gptConvert(questionContent, mentorInfo);
+                isMatch = patternMatch(message);
+            }
+        }
+
+        String[] parts = message.split(" ");
+        long[] numbers = new long[parts.length];
+
+        log.info("numbers:{}", numbers);
+
+        for (int i = 0; i < parts.length; i++) {
+            numbers[i] = Long.parseLong(parts[i]); // 각 부분을 정수로 변환하여 저장
+        }
+
+        for (long number : numbers) {
+            Member member = memberRepository.findById(number)
+                    .orElseThrow(() -> new RuntimeException("not found member"));
+
+            MemberResponse memberResponse = memberMapper.toResponse(member);
+            memberResponses.add(memberResponse);
+        }
+
+        return memberResponses;
+    }
+
+
+    public static String convertToJsonString(MemberListResponse mentorList) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<JsonMentorResponse> jsonMentorResponses = new ArrayList<>();
+
+        for (MemberResponse memberResponse : mentorList.getMemberList()) {
+            JsonMentorResponse jsonResponse = JsonMentorResponse.builder()
+                    .id(memberResponse.getId())
+                    .expertiseField(memberResponse.getExpertiseField())
+                    .publicRelations(memberResponse.getPublicRelations())
+                    .build();
+
+            jsonMentorResponses.add(jsonResponse);
+        }
+        try {
+            return objectMapper.writeValueAsString(jsonMentorResponses);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String gptConvert(String questionContent, String mentorInfo) {
+        GPTRequest gptRequest = new GPTRequest(model, questionContent+FIRST+mentorInfo+FINAL,
+                1, 256, 1, 2, 2);
+        GPTResponse response = restTemplate.postForObject(apiURL, gptRequest, GPTResponse.class);
+
+        return response.getChoices().get(0).getMessage().getContent();
+    }
+
+    public static boolean patternMatch(String message) {
+        Pattern compile = Pattern.compile(pattern);
+        Matcher matcher = compile.matcher(message);
+        boolean isMatch = matcher.matches();
+        return isMatch;
     }
 }
