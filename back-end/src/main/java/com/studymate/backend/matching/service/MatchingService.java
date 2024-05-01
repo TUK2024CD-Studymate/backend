@@ -7,6 +7,9 @@ import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
 import com.studymate.backend.matching.dto.JsonMentorResponse;
 import com.studymate.backend.member.MemberMapper;
+import com.studymate.backend.heart.dto.LikeSseResponse;
+import com.studymate.backend.matching.dto.MatchingSseResponse;
+
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
@@ -14,6 +17,7 @@ import com.studymate.backend.member.domain.Part;
 import com.studymate.backend.member.dto.MemberListResponse;
 import com.studymate.backend.member.dto.MemberResponse;
 import com.studymate.backend.member.service.MemberService;
+import com.studymate.backend.notification.service.NotificationService;
 import com.studymate.backend.question.QuestionRepository;
 import com.studymate.backend.question.domain.Question;
 import com.studymate.backend.question.dto.QuestionAiResponse;
@@ -30,6 +34,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +45,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @RequiredArgsConstructor
 public class MatchingService {
+    private final NotificationService notificationService;
     private final MemberService memberService;
     private final QuestionRepository questionRepository;
     private final PushNotificationService pushNotificationService;
@@ -52,6 +60,11 @@ public class MatchingService {
     private String model;
     @Value("${openai.api.url}")
     private String apiURL;
+
+    
+
+
+
     @Value("${coolsms.apikey}")
     private String apiKey;
     @Value("${coolsms.apisecret}")
@@ -90,6 +103,8 @@ public class MatchingService {
     }
 
     public String matchingForSms(Long questionId, Long mentorId) {
+        Member member = memberService.getMember();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         Message coolsms = new Message(apiKey, apiSecret);
 
@@ -110,6 +125,14 @@ public class MatchingService {
             System.out.println(e.getMessage());
             System.out.println(e.getCode());
         }
+
+        MatchingSseResponse matchingSseResponse = MatchingSseResponse.builder()
+                .nickname(member.getNickname()) // 사용자 닉네임
+                .question_id(question.getId()) // 게시물 ID
+                .likedTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(formatter))
+                .build();
+
+        notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
 
 
         return mentor.getNickname()+"님에게 전송문자 전송을 하였습니다.";

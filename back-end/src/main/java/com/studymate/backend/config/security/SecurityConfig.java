@@ -66,8 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/gpt/**").permitAll()
                         .requestMatchers("/api/logout").permitAll()
-                        .requestMatchers("/api/healthcheck").permitAll()
-                        .requestMatchers("/subscribe/**").permitAll()
+                        .requestMatchers("/api/subscribe/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement
