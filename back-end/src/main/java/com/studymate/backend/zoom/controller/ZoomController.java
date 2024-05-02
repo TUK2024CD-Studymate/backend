@@ -43,7 +43,7 @@ public class ZoomController {
 
         FormBody formBody = new FormBody.Builder()
                 .add("code", code)
-                .add("redirect_uri", "http://studymate154:8080/api/meeting/zoomApi")
+                .add("redirect_uri", "http://3.36.177.42/api/meeting/zoomApi")
                 .add("grant_type", "authorization_code")
                 .add("code_verifier", DecEncUtil.encode(code))
                 .build();
