@@ -10,6 +10,7 @@ import com.studymate.backend.chat.mapper.ChatMapper;
 import com.studymate.backend.chat.repository.ChatMessageRepository;
 import com.studymate.backend.chat.repository.ChatRoomRepository;
 import com.studymate.backend.chat.repository.UserChatRoomRepository;
+import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMapper chatMapper;
+    private final MemberRepository memberRepository;
+
 
     @Transactional
     public ChatRoom createChatRoom(String chatRoomName) {
@@ -43,6 +46,13 @@ public class ChatService {
         UserChatRoom newUserChatRoom = chatMapper.toUserChatRoom(member, chatRoom);
 
         userChatRoomRepository.save(newUserChatRoom);
+    }
+
+    public void addUserToRoom(Long roomId, Long memberId) {
+        UserChatRoom userChatRoom = new UserChatRoom();
+        userChatRoom.setChatRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found")));
+        userChatRoom.setMember(memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found")));
+        userChatRoomRepository.save(userChatRoom);
     }
 
     public boolean duplicatedUserChatRoom(Member member) {
