@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -83,10 +84,13 @@ public class TokenProvider implements InitializingBean {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+        String authoritiesString = claims.get(AUTHORITIES_KEY, String.class); // 권한 문자열 가져오기
+        Collection<? extends GrantedAuthority> authorities = (authoritiesString == null || authoritiesString.isEmpty())
+                ? Collections.emptyList() // 권한이 없거나 비어있으면 빈 리스트 반환
+                : Arrays.stream(authoritiesString.split(","))
+                .filter(authStr -> !authStr.isEmpty()) // 비어있는 문자열 제거
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
 
         User principal = new User(claims.getSubject(), "", authorities);
 

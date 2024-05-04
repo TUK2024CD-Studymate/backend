@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "채팅", description = "채팅 API")
 public class ChatRoomController {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private ChatRoomRepository chatRoomRepository;
 
     @GetMapping("/room")
     public String rooms(Model model) {
