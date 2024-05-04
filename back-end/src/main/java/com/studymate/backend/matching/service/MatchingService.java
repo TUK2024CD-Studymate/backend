@@ -1,5 +1,6 @@
 package com.studymate.backend.matching.service;
 
+import com.studymate.backend.chat.service.ChatService;
 import com.studymate.backend.commons.firebase.PushNotificationService;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
@@ -34,6 +35,7 @@ public class MatchingService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
+    private final ChatService chatService;
 
     @Value("${coolsms.apikey}")
     private String apiKey;
@@ -94,6 +96,12 @@ public class MatchingService {
             System.out.println(e.getMessage());
             System.out.println(e.getCode());
         }
+
+        // 채팅방 생성
+        Long chatRoomId = chatService.createChatRoom(mentor.getNickname() + " & " + question.getMember().getNickname()).getId();
+        // 멘토와 멘티 채팅방 참여
+        chatService.addUserToRoom(chatRoomId, mentorId);
+        chatService.addUserToRoom(chatRoomId, question.getMember().getId());
 
 
         return mentor.getNickname()+"님에게 전송문자 전송을 하였습니다.";
