@@ -11,5 +11,6 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomRes {
     private Long chatRoomId;
+    private String name; // 채팅방 이름
     private String nickname;    // 문의한 회원
 }

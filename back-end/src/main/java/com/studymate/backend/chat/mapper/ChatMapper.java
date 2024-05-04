@@ -47,6 +47,7 @@ public class ChatMapper {
         return ChatRoomRes.builder()
                 .chatRoomId(userChatRoom.getChatRoom().getId())
                 .nickname(userChatRoom.getMember().getNickname())
+                .name(userChatRoom.getChatRoom().getName())
                 .build();
     }
 

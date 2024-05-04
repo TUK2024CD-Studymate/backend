@@ -27,8 +27,10 @@ public class ChatService {
     private final ChatMapper chatMapper;
 
     @Transactional
-    public ChatRoom createChatRoom() {
-        ChatRoom newChatRoom = ChatRoom.builder().build();
+    public ChatRoom createChatRoom(String chatRoomName) {
+        ChatRoom newChatRoom = ChatRoom.builder()
+                .name(chatRoomName) // 이름 설정
+                .build();
         chatRoomRepository.save(newChatRoom);
 
         return newChatRoom;
@@ -47,10 +49,11 @@ public class ChatService {
         return userChatRoomRepository.existsByMemberId(member.getId());
     }
 
-    public UserChatRoom findUserChatRoomByMemberId(Long memberId) {
-        return userChatRoomRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("멤버 아이디에 해당하는 채팅룸이 존재하지 않습니다")); // TODO: 에러처리 수정
+    public List<ChatRoomRes> findUserChatRoomByMemberId(Long memberId) {
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findByMemberId(memberId);
+        return chatMapper.toChatRoomList(userChatRooms);
     }
+
 
     public void saveMessage(Member sender, Long chatRoomId, CreateMessageReq createMessageReq) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
