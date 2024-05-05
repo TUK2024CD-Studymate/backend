@@ -97,6 +97,14 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(key)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
     public String extractJwt(final StompHeaderAccessor accessor) {
         String headerValue = accessor.getFirstNativeHeader("Authorization");
         if (headerValue != null && headerValue.startsWith("Bearer ")) {
