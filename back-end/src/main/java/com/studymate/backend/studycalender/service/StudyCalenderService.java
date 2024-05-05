@@ -73,8 +73,7 @@ public class StudyCalenderService {
         long seconds = calender.convertSeconds(startTime, endTime);
         calender.setEntireTime(seconds);
 
-        calender.update(request.getContent(), request.getInterests(),
-                request.getStartTime(), request.getEndTime());
+        calender.update(request.getInterests(), request.getStartTime(), request.getEndTime());
 
         return studyCalenderMapper.toResponse(calender);
     }
