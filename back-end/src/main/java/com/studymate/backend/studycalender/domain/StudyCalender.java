@@ -24,26 +24,16 @@ public class StudyCalender extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "calender_id")
     private Long id;
-
-    private String content;
-
-    @Enumerated(value = EnumType.STRING)
-    private Interests studyClass;
-
+    private String studyClass;
     private LocalDateTime startTime;
-
     private LocalDateTime endTime;
-
     private LocalTime entireTime;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    public void update(String content, Interests studyClass,
-                       LocalDateTime startTime, LocalDateTime endTime) {
-        this.content = content;
+    public void update( String studyClass, LocalDateTime startTime, LocalDateTime endTime) {
         this.studyClass = studyClass;
         this.startTime = startTime;
         this.endTime = endTime;
