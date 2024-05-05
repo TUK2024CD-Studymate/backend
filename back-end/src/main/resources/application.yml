@@ -14,10 +14,13 @@ spring:
   #    password:
   #    driver-class-name: org.h2.Driver
 
+
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
+    open-in-view: false
     hibernate:
       ddl-auto: update
+#      ddl-auto: create-drop
     properties:
       hibernate:
         show_sql: true
@@ -68,3 +71,9 @@ coolsms:
   fromnumber: "07080985380"
   apisecret: "HBCJAHWPRDXY9VAQAQFUQIRQRWROLZXX"
   apikey: "NCSXX2T6BEFTBVEK"
+
+openai:
+  api:
+    key: ${OPENAI_KEY}
+    url: https://api.openai.com/v1/chat/completions
+  model: gpt-3.5-turbo
