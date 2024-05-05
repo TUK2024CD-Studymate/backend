@@ -45,13 +45,12 @@ public class CommentService {
         String notificationMessage = member.getNickname() + "님이 댓글을 달았습니다.";
 
         // 게시물 작성자에게 알림 보내기
-        notificationService.customNotify(post.getMember(), commentSseResponse, notificationMessage, "Comment");
+        notificationService.customNotify(post.getMember().getId(), commentSseResponse, notificationMessage, "Comment");
 
         return CommentResponse.toResponse(savedComment);
     }
 
     // 해당 게시글의 댓글 조회
-    @Transactional
     public List<CommentResponse> list(Long postId){
         return commentListResponse.getList(postId);
     }
@@ -77,7 +76,6 @@ public class CommentService {
     }
 
     // 댓글 수 반환
-    @Transactional
     public Long countCommentsByPostId(Long postId) {
         return commentRepository.countByPostId(postId);
     }

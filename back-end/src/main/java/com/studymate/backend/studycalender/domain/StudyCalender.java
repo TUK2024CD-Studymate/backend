@@ -24,32 +24,41 @@ public class StudyCalender extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "calender_id")
     private Long id;
-    private String studyClass;
+
+    private String content;
+
+    @Enumerated(value = EnumType.STRING)
+    private Interests studyClass;
+
     private LocalDateTime startTime;
+
     private LocalDateTime endTime;
+
     private LocalTime entireTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    public void update( String studyClass, LocalDateTime startTime, LocalDateTime endTime) {
+    public void update(String content, Interests studyClass,
+                       LocalDateTime startTime, LocalDateTime endTime) {
+        this.content = content;
         this.studyClass = studyClass;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public long convertSeconds(LocalDateTime startTime, LocalDateTime endTime) {
+    public long convertMinutes(LocalDateTime startTime, LocalDateTime endTime) {
         Duration time = Duration.between(startTime, endTime);
-        return time.toSeconds();
+        return time.toMinutes();
     }
 
     public void setEntireTime(long time) {
-        Duration duration = Duration.ofSeconds(time);
+        Duration duration = Duration.ofMinutes(time);
         long hours = duration.toHours();
         int minutes = duration.toMinutesPart();
-        int seconds = duration.toSecondsPart();
-        this.entireTime = LocalTime.of((int) hours, minutes,seconds);
+        this.entireTime = LocalTime.of((int) hours, minutes);
     }
 
     public String serializeTime(LocalTime time) {

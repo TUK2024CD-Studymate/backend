@@ -18,6 +18,7 @@ public class StudyCalenderMapper {
     public StudyCalender toEntity(CalenderCreateRequest request, Member member) {
 
         return StudyCalender.builder()
+                .content(request.getContent())
                 .endTime(request.getEndTime())
                 .studyClass(request.getStudyClass())
                 .startTime(request.getStartTime())
@@ -29,6 +30,7 @@ public class StudyCalenderMapper {
 
         return CalenderResponse.builder()
                 .id(studyCalender.getId())
+                .content(studyCalender.getContent())
                 .endTime(studyCalender.getEndTime())
                 .studyClass(studyCalender.getStudyClass())
                 .startTime(studyCalender.getStartTime())

@@ -33,7 +33,7 @@ public class ZoomController {
 
     @RequestMapping(value = "/api/meeting/zoomApi", method = {RequestMethod.GET
             , RequestMethod.POST})
-    public String googleAsync(HttpServletRequest req,
+    public ResponseEntity<?> googleAsync(HttpServletRequest req,
                                          @RequestParam(required = false) String code) throws
             IOException, NoSuchAlgorithmException {
 
@@ -43,7 +43,8 @@ public class ZoomController {
 
         FormBody formBody = new FormBody.Builder()
                 .add("code", code)
-                .add("redirect_uri", "http://3.36.177.42/api/meeting/zoomApi")
+//                .add("redirect_uri", "http://localhost:8080/api/meeting/zoomApi//")
+                .add("redirect_uri", "http://study-mate.kro.kr:8080/api/meeting/zoomApi")
                 .add("grant_type", "authorization_code")
                 .add("code_verifier", DecEncUtil.encode(code))
                 .build();
@@ -66,7 +67,8 @@ public class ZoomController {
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
         log.info("accessToken:{}", accessToken);
-        return "zoomLogin";
+//        return "zoomLogin";
+        return ResponseEntity.ok().body(list);
     }
 
     @GetMapping("/api/get/token")

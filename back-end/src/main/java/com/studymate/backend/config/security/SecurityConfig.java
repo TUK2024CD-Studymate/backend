@@ -4,9 +4,12 @@ import com.studymate.backend.config.security.jwt.JwtAccessDeniedHandler;
 import com.studymate.backend.config.security.jwt.JwtAuthenticationEntryPoint;
 import com.studymate.backend.config.security.jwt.JwtSecurityConfig;
 import com.studymate.backend.config.security.jwt.TokenProvider;
+import com.studymate.backend.member.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,18 +25,22 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 @EnableMethodSecurity
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig{
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final RedisTemplate<String,String> redisTemplate;
 
+
+
+
     public SecurityConfig(TokenProvider tokenProvider,
                           CorsFilter corsFilter,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                           JwtAccessDeniedHandler jwtAccessDeniedHandler,
-                          RedisTemplate<String, String> redisTemplate) {
+                          RedisTemplate<String, String> redisTemplate
+                          ) {
 
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
@@ -64,9 +71,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/chat/**").permitAll()
-                        .requestMatchers("/api/gpt/**").permitAll()
                         .requestMatchers("/api/logout").permitAll()
-                        .requestMatchers("/api/subscribe/**").permitAll()
+                        .requestMatchers("/subscribe/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement

@@ -32,6 +32,7 @@ public class MemberService {
     private final TokenProvider tokenProvider;
 
     @Transactional
+
     public String signup(MemberRequest request) {
         if (memberRepository.findOneWithAuthoritiesByEmail(request.getEmail()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 회원입니다.");
@@ -44,12 +45,6 @@ public class MemberService {
     }
 
     @Transactional
-    public void setActivated(MemberLoginRequest request) {
-        Member member = memberRepository.findByEmail(request.getEmail());
-        member.loginMemberActivated();
-    }
-
-    @Transactional
     public void logout(TokenRequestDto tokenRequestDto) {
         if (!tokenProvider.validateToken(tokenRequestDto.getAccessToken())) {
             throw new IllegalArgumentException("로그아웃 : 유효하지 않은 토큰입니다.");
@@ -58,10 +53,9 @@ public class MemberService {
         Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
 
         if (redisTemplate.opsForValue().get(authentication.getName()) != null) {
-            Member member = getMember();
-            member.logoutMemberActivated();
             redisTemplate.delete(authentication.getName());
         }
+
 
         Long expiration = tokenProvider.getExpiration(tokenRequestDto.getAccessToken());
         redisTemplate.opsForValue().set(tokenRequestDto.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);

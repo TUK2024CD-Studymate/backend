@@ -1,25 +1,21 @@
 package com.studymate.backend.chat.domain;
 
-import java.time.LocalDateTime;
-
 import com.studymate.backend.global.BaseTimeEntity;
 import com.studymate.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Getter
 @Builder
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessage extends BaseTimeEntity {
+@NoArgsConstructor
+@Setter
+public class UserChatRoom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_message_id")
+    @Column(name = "user_chat_room_id")
     private Long id;
-    private String content;
-    private LocalDateTime sendDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
