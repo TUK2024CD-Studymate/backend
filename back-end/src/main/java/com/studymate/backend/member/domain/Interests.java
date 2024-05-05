@@ -15,4 +15,8 @@ public enum Interests {
         this.korean = korean;
     }
 
+    public String getKorean() {
+        return korean;
+    }
+
 }
