@@ -65,8 +65,7 @@ public class ChatController {
         chatService.createUserChatRoom(member, chatRoom.getId());
         ChatRoomRes chatRoomRes = ChatRoomRes.builder()
                 .chatRoomId(chatRoom.getId())
-                .nickname(member.getNickname())
-                .name(chatRoomName) // 채팅방 이름 포함
+                .chatRoomName(chatRoomName)// 채팅방 이름 포함
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomRes);

@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,7 @@ public class ChatService {
         userChatRoomRepository.save(newUserChatRoom);
     }
 
+    @Transactional
     public void addUserToRoom(Long roomId, Long memberId) {
         UserChatRoom userChatRoom = new UserChatRoom();
         userChatRoom.setChatRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found")));
@@ -59,12 +62,32 @@ public class ChatService {
         return userChatRoomRepository.existsByMemberId(member.getId());
     }
 
+
+    @Transactional
     public List<ChatRoomRes> findUserChatRoomByMemberId(Long memberId) {
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findByMemberId(memberId);
-        return chatMapper.toChatRoomList(userChatRooms);
+        List<ChatRoomRes> chatRoomResList = new ArrayList<>();
+
+        for (UserChatRoom userChatRoom : userChatRooms) {
+            ChatRoom chatRoom = userChatRoom.getChatRoom();
+            // 모든 멤버 조회
+            List<Member> allMembers = userChatRoomRepository.findByChatRoomId(chatRoom.getId())
+                    .stream()
+                    .map(UserChatRoom::getMember)
+                    .collect(Collectors.toList());
+            // 현재 사용자를 제외한 멤버 필터링
+            List<Member> otherMembers = allMembers.stream()
+                    .filter(m -> !m.getId().equals(memberId))
+                    .collect(Collectors.toList());
+
+            ChatRoomRes chatRoomRes = chatMapper.toChatRoomDto(chatRoom, otherMembers);
+            chatRoomResList.add(chatRoomRes);
+        }
+        return chatRoomResList;
     }
 
 
+    @Transactional
     public void saveMessage(Member sender, Long chatRoomId, CreateMessageReq createMessageReq) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chatRoomId));
@@ -73,15 +96,16 @@ public class ChatService {
         chatMessageRepository.save(message);
     }
 
+    @Transactional
     public List<ChatMessageRes> findChatMessage(Long chatRoomId) {
         List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
 
         return chatMapper.toChatMessageList(chatMessages);
     }
 
-    public List<ChatRoomRes> findChatRoom() {
-        List<UserChatRoom> chatRooms = userChatRoomRepository.findAll();
-
-        return chatMapper.toChatRoomList(chatRooms);
-    }
+//    public List<ChatRoomRes> findChatRoom() {
+//        List<UserChatRoom> chatRooms = userChatRoomRepository.findAll();
+//
+//        return chatMapper.toChatRoomList(chatRooms);
+//    }
 }

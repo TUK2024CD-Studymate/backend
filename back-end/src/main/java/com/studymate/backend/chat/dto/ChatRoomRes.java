@@ -4,13 +4,25 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
+@Setter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access =  AccessLevel.PRIVATE)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomRes {
     private Long chatRoomId;
-    private String name; // 채팅방 이름
-    private String nickname;    // 문의한 회원
+    private String chatRoomName;
+    private List<MemberDetail> members; // 채팅방 멤버 정보
+
+    @Getter
+    @Setter
+    @Builder
+    public static class MemberDetail {
+        private Long id;
+        private String name;
+        private String nickname;
+        private String expertiseField;
+        private List<String> interests; // 가정: interests가 문자열 리스트로 표현됨
+        private boolean isLogin;
+    }
 }

@@ -10,6 +10,7 @@ import com.studymate.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,20 +44,32 @@ public class ChatMapper {
                 .build();
     }
 
-    public ChatRoomRes toChatRoomDto(UserChatRoom userChatRoom) {
+    public ChatRoomRes toChatRoomDto(ChatRoom chatRoom, List<Member> otherMembers) {
         return ChatRoomRes.builder()
-                .chatRoomId(userChatRoom.getChatRoom().getId())
-                .nickname(userChatRoom.getMember().getNickname())
-                .name(userChatRoom.getChatRoom().getName())
+                .chatRoomId(chatRoom.getId())
+                .chatRoomName(chatRoom.getName())
+                .members(otherMembers.stream().map(this::toMemberDetail).collect(Collectors.toList()))
                 .build();
     }
+
+    private ChatRoomRes.MemberDetail toMemberDetail(Member member) {
+        return ChatRoomRes.MemberDetail.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .expertiseField(member.getExpertiseField())
+                .interests(Collections.singletonList(member.getInterests().getKorean())) // 관심사를 한 개의 String으로 변환
+                .isLogin(member.isLogin())
+                .build();
+    }
+
 
     public List<ChatMessageRes> toChatMessageList(List<ChatMessage> messages) {
         return messages.stream().map(this::toChatMessageDto).collect(Collectors.toList());
     }
 
-    public List<ChatRoomRes> toChatRoomList(List<UserChatRoom> chatRooms) {
-        return chatRooms.stream().map(this::toChatRoomDto).collect(Collectors.toList());
-    }
+//    public List<ChatRoomRes> toChatRoomList(List<UserChatRoom> chatRooms) {
+//        return chatRooms.stream().map(this::toChatRoomDto).collect(Collectors.toList());
+//    }
 }
 
