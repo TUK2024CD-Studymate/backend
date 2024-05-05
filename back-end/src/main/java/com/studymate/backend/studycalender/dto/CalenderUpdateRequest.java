@@ -20,14 +20,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Schema(description = "스터디 기록을 수정할때 필요한 데이터")
 public class CalenderUpdateRequest {
-
-    @NotBlank
-    @Schema(description = "스터디 내용", nullable = false, example = "조동사(助動詞, auxiliary verb (aux))란 동사와 같은 형태를 가지지만, 다른 동사와 이어져서 상, 법 등의 문법 기능을 나타내는 단어이다. 일본어의 ‘-ている’나 ‘-ておく’ 등, 영어의 can이나 will 등이 있다.")
-    private String content;
-
     @NotNull
-    @Schema(description = "스터디 분류", nullable = false, example = "ENGLISH")
-    private Interests interests;
+    @Schema(description = "스터디 분류", nullable = false, example = "영어 문법")
+    private String interests;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
