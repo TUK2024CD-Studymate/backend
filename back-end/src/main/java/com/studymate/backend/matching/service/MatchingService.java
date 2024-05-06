@@ -313,9 +313,11 @@ public class MatchingService {
 
         // 형식 검증 로직
         if (!isMatch) {
-            while (isMatch) {
+            while (!isMatch) {
                 message = gptConvert(questionContent, mentorInfo);
                 isMatch = patternMatch(message);
+                log.info("Change message :{}",message);
+                log.info("Change isMatch:{}",isMatch);
             }
         }
 
@@ -370,7 +372,7 @@ public class MatchingService {
         return response.getChoices().get(0).getMessage().getContent();
     }
 
-    public static boolean patternMatch(String message) {
+    public boolean patternMatch(String message) {
         Pattern compile = Pattern.compile(pattern);
         Matcher matcher = compile.matcher(message);
         boolean isMatch = matcher.matches();
