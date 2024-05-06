@@ -11,10 +11,19 @@ import com.studymate.backend.zoom.util.DecEncUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
-import org.springframework.http.*;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -33,7 +42,7 @@ public class ZoomController {
 
     @RequestMapping(value = "/api/meeting/zoomApi", method = {RequestMethod.GET
             , RequestMethod.POST})
-    public ResponseEntity<?> googleAsync(HttpServletRequest req,
+    public String googleAsync(HttpServletRequest req,
                                          @RequestParam(required = false) String code) throws
             IOException, NoSuchAlgorithmException {
 
@@ -43,8 +52,7 @@ public class ZoomController {
 
         FormBody formBody = new FormBody.Builder()
                 .add("code", code)
-//                .add("redirect_uri", "http://localhost:8080/api/meeting/zoomApi//")
-                .add("redirect_uri", "http://study-mate.kro.kr:8080/api/meeting/zoomApi")
+                .add("redirect_uri", "http://3.36.177.42/api/meeting/zoomApi")
                 .add("grant_type", "authorization_code")
                 .add("code_verifier", DecEncUtil.encode(code))
                 .build();
@@ -67,8 +75,7 @@ public class ZoomController {
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
         log.info("accessToken:{}", accessToken);
-//        return "zoomLogin";
-        return ResponseEntity.ok().body(list);
+        return "zoomLogin";
     }
 
     @GetMapping("/api/get/token")
