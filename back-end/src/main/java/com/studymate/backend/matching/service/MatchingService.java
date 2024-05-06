@@ -1,5 +1,7 @@
 package com.studymate.backend.matching.service;
 
+
+import com.studymate.backend.chat.service.ChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studymate.backend.commons.firebase.PushNotificationService;
@@ -20,7 +22,6 @@ import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.notification.service.NotificationService;
 import com.studymate.backend.question.QuestionRepository;
 import com.studymate.backend.question.domain.Question;
-import com.studymate.backend.question.dto.QuestionAiResponse;
 import com.studymate.backend.review.ReviewMapper;
 import com.studymate.backend.review.ReviewRepository;
 import com.studymate.backend.review.domain.Review;
@@ -52,6 +53,8 @@ public class MatchingService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
+    private final ChatService chatService;
+
     private final RestTemplate restTemplate;
     private final MemberMapper memberMapper;
     private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토를 출력해. 멘토들의 정보 : ";
@@ -61,7 +64,8 @@ public class MatchingService {
     @Value("${openai.api.url}")
     private String apiURL;
 
-    
+
+
 
 
 
@@ -126,6 +130,9 @@ public class MatchingService {
             System.out.println(e.getCode());
         }
 
+
+
+
         MatchingSseResponse matchingSseResponse = MatchingSseResponse.builder()
                 .nickname(member.getNickname()) // 사용자 닉네임
                 .question_id(question.getId()) // 게시물 ID
@@ -134,6 +141,11 @@ public class MatchingService {
 
         notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
 
+        // 채팅방 생성
+        Long chatRoomId = chatService.createChatRoom(mentor.getNickname() + " & " + question.getMember().getNickname()).getId();
+        // 멘토와 멘티 채팅방 참여
+        chatService.addUserToRoom(chatRoomId, mentorId);
+        chatService.addUserToRoom(chatRoomId, question.getMember().getId());
 
         return mentor.getNickname()+"님에게 전송문자 전송을 하였습니다.";
 
