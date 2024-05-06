@@ -52,7 +52,7 @@ public class HeartService {
                 .build();
 
         // 게시물 작성자에게 구체적인 알림 데이터 보내기
-        notificationService.customNotify(post.getMember(), likeSseResponse, "작성하신 게시글에 좋아요가 달렸습니다.", "Like");
+        notificationService.customNotify(post.getMember().getId(), likeSseResponse, "작성하신 게시글에 좋아요가 달렸습니다.", "Like");
 
         HeartResponse response = heartMapper.toResponse(heart);
         return response;

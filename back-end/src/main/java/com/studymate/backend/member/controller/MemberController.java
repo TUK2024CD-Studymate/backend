@@ -1,5 +1,6 @@
 package com.studymate.backend.member.controller;
 
+import com.studymate.backend.commons.firebase.FCMTokenManager;
 import com.studymate.backend.config.security.jwt.JwtFilter;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.dto.*;
@@ -35,6 +36,7 @@ public class MemberController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberService memberService;
     private final PostService postService;
+    private final FCMTokenManager fcmTokenManager;
     private final RedisTemplate<String, String> redisTemplate;
 
     @PostMapping("/signIn")
@@ -64,7 +66,6 @@ public class MemberController {
         redisTemplate.opsForValue().set(authentication.getName(), token.getRefreshToken(),
                 token.getRefreshTokenValidationTime(), TimeUnit.MICROSECONDS);
 
-        memberService.setActivated(request);
 
         return ResponseEntity.ok().body(token);
     }
@@ -75,6 +76,11 @@ public class MemberController {
     public ResponseEntity<String> logout(@RequestBody TokenRequestDto request) {
         memberService.logout(request);
         return ResponseEntity.ok().body("로그아웃 완료");
+    }
+
+    @GetMapping("member/test/fcm/{userId}")
+    public ResponseEntity<?> getFcmToken(@PathVariable("userId") Long id) {
+        return ResponseEntity.ok().body(fcmTokenManager.getToken(String.valueOf(id)));
     }
 
     @GetMapping("/user")
@@ -115,10 +121,5 @@ public class MemberController {
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<?> delete() {
         return ResponseEntity.ok(memberService.delete());
-    }
-
-    @GetMapping("/healthcheck")
-    public ResponseEntity<?> healthCheck() {
-        return ResponseEntity.ok("OK");
     }
 }
