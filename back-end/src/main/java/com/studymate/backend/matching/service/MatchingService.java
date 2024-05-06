@@ -1,17 +1,15 @@
 package com.studymate.backend.matching.service;
 
 
-import com.studymate.backend.chat.service.ChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.studymate.backend.chat.service.ChatService;
 import com.studymate.backend.commons.firebase.PushNotificationService;
 import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
 import com.studymate.backend.matching.dto.JsonMentorResponse;
-import com.studymate.backend.member.MemberMapper;
-import com.studymate.backend.heart.dto.LikeSseResponse;
 import com.studymate.backend.matching.dto.MatchingSseResponse;
-
+import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;

@@ -38,6 +38,7 @@ public class PostService {
     }
 
     // 게시글 리스트
+    @Transactional
     public List<PostResponseDto> list() {
         List<Post> posts = postRepository.findAll();
         return posts.stream()
@@ -46,6 +47,7 @@ public class PostService {
     }
 
     // 게시글 조회
+    @Transactional
     public PostResponseDto find(Long post_id) {
         Post post = postRepository.findById(post_id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
@@ -71,6 +73,7 @@ public class PostService {
         return "success";
     }
 
+    @Transactional
     public List<PostResponseDto> searchByKeyword(String keyword) {
         List<Post> posts = postRepository.findByKeyword(keyword);
         return posts.stream()
@@ -79,12 +82,14 @@ public class PostService {
     }
 
     // 내가 쓴 게시물 조회
+    @Transactional
     public List<PostResponseDto> findMemberPost() {
         Member member = memberService.getMember();
         List<Post> posts = postRepository.findAllByMember(member);
         return posts.stream().map(postMapper::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional
     public List<PostResponseDto> getHeartPost() {
         Member member = memberService.getMember();
 

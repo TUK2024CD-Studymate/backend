@@ -32,23 +32,6 @@ public class StompHandler implements ChannelInterceptor {
             final String authorization = tokenProvider.extractJwt(accessor);
             tokenProvider.validateToken(authorization);
 
-//            final String destination = accessor.getDestination();
-//            if(destination == null ) {throw new NullPointerException("없음");}
-//            log.info("destination: {}", destination);
-
-//            // 세션에 사용자 정보 저장
-//            if (tokenProvider.validateToken(authorization)) {
-//                String username = tokenProvider.extractUsername(authorization);
-//                UserDetail userDetail = (UserDetail) customUserDetailsService.loadUserByUsername(username);
-//
-////                // 채팅방 입장
-////                if (!userChatRoomService.duplicatedUserChatRoom(userDetail.getUser())) {    // 유저 채팅방 중복 예외처리
-////                    ChatRoom chatRoom = userChatRoomService.createChatRoom();
-////                    userChatRoomService.createUserChatRoom(userDetail.getUser(), chatRoom.getId());
-////                    log.info("SUBSCRIBED {}, {}", userDetail.getUserId(), chatRoom.getId());
-////                }
-//
-//                Objects.requireNonNull(accessor.getSessionAttributes()).put("userDetail", userDetail);
             }
         return message;
     }

@@ -19,72 +19,49 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
-    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
+    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;  // 60 minutes
 
-    public SseEmitter subscribe(Long userId) {
-        SseEmitter emitter = createEmitter(userId);
-
-        sendToClient(userId, "EventStream Created. [userId="+ userId + "]", "sse 접속 성공");
+    public SseEmitter subscribe(String userEmail) {
+        Member member = memberRepository.findByEmail(userEmail);
+        SseEmitter emitter = createEmitter(member);
+        sendToClient(member, "EventStream Created. [userId=" + member.getId() + "]", "sse 접속 성공", "접속 여부");
         return emitter;
     }
 
-    public <T> void customNotify(Long userId, T data, String comment, String type) {
-        try{
-            sendToClient(userId, data, comment, type);
-            logger.info("Successfully sent notification");
-        }
-        catch (Exception e){
-            logger.error("Failed to send notification");
-        }
-    }
-    public void notify(Long userId, Object data, String comment) {
-        sendToClient(userId, data, comment);
+    public void customNotify(Member member, Object data, String comment, String eventName) {
+        sendToClient(member, data, comment, eventName);
     }
 
-    private void sendToClient(Long userId, Object data, String comment) {
-        SseEmitter emitter = emitterRepository.get(userId);
+    private void sendToClient(Member member, Object data, String comment, String eventName) {
+        SseEmitter emitter = emitterRepository.get(member.getId());
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .id(String.valueOf(userId))
-                        .name("sse")
+                        .id(String.valueOf(member.getId()))
+                        .name(eventName)
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {
-                emitterRepository.deleteById(userId);
+                emitterRepository.deleteById(member.getId());
                 emitter.completeWithError(e);
+                logger.error("Failed to send notification to userId={}, error={}", member.getId(), e.getMessage());
             }
         }
     }
 
-    private <T> void sendToClient(Long userId, T data, String comment, String type) {
-        SseEmitter emitter = emitterRepository.get(userId);
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .id(String.valueOf(userId))
-                        .name(type)
-                        .data(data)
-                        .comment(comment));
-            } catch (IOException e) {
-                emitterRepository.deleteById(userId);
-                emitter.completeWithError(e);
-            }
-        }
-    }
-
-    private SseEmitter createEmitter(Long userId) {
+    private SseEmitter createEmitter(Member member) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        emitterRepository.save(userId, emitter);
+        emitterRepository.save(member.getId(), emitter);
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(userId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(userId));
+        emitter.onCompletion(() -> {
+            emitterRepository.deleteById(member.getId());
+            logger.info("SSE Emitter for userId={} completed", member.getId());
+        });
+        emitter.onTimeout(() -> {
+            emitterRepository.deleteById(member.getId());
+            logger.info("SSE Emitter for userId={} timed out", member.getId());
+        });
 
         return emitter;
     }
-
-    private Member validUser(Long userId) {
-        return memberRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("멤버 ID " + userId + "에 해당하는 유저를 찾을 수 없습니다."));
-    }
-
 }
