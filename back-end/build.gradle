@@ -53,8 +53,6 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.8.9'
 	implementation("org.springframework.security:spring-security-messaging")
 
-
-
 	//FCM
 	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.8.1'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'

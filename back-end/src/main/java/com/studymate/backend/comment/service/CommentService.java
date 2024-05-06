@@ -51,6 +51,7 @@ public class CommentService {
     }
 
     // 해당 게시글의 댓글 조회
+    @Transactional
     public List<CommentResponse> list(Long postId){
         return commentListResponse.getList(postId);
     }
@@ -76,6 +77,7 @@ public class CommentService {
     }
 
     // 댓글 수 반환
+    @Transactional
     public Long countCommentsByPostId(Long postId) {
         return commentRepository.countByPostId(postId);
     }
