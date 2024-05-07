@@ -95,15 +95,7 @@ public class MatchingService {
         return mentorList;
     }
 
-    public String matching(Long questionId, Long mentorId) {
-
-        log.info("FCM start");
-        pushNotificationService.matchingNotification(mentorId, questionId);
-        log.info("FCM finish");
-
-        return "해당 멘토에게 매칭 알림을 보냈습니다.";
-    }
-
+    @Transactional
     public String matchingForSms(Long questionId, Long mentorId) {
         Member member = memberService.getMember();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
