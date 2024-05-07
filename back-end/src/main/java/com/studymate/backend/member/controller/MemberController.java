@@ -84,7 +84,7 @@ public class MemberController {
     }
 
     @GetMapping("/user")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+//    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @Operation(summary = "회원정보 조회", description = "자신의 회원정보를 단건으로 조회한다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<MemberResponse> getMyUserInfo() {
@@ -92,7 +92,7 @@ public class MemberController {
     }
 
     @PutMapping("/user")
-    @PreAuthorize("hasAnyRole('USER')")
+//    @PreAuthorize("hasAnyRole('USER')")
     @Operation(summary = "회원 정보 수정", description = "프로필 이미지를 제외한 회원정보를 수정한다")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<MemberResponse> update(@Valid @RequestBody MemberUpdateRequest request) {
@@ -100,7 +100,7 @@ public class MemberController {
     }
 
     @GetMapping("/user/post")
-    @PreAuthorize("hasAnyRole('USER')")
+//    @PreAuthorize("hasAnyRole('USER')")
     @Operation(summary = "작성한 게시물 조회", description = "자신이 작성한 게시물을 조회한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<PostResponseDto>> getMyPost() {
@@ -108,7 +108,7 @@ public class MemberController {
     }
 
     @GetMapping("/user/post/heart")
-    @PreAuthorize("hasAnyRole('USER')")
+//    @PreAuthorize("hasAnyRole('USER')")
     @Operation(summary = "좋아요를 누른 게시물 조회", description = "회원이 좋아요를 누른 게시물을 조회한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<List<PostResponseDto>> getMyHeartPost() {
@@ -116,7 +116,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/user")
-    @PreAuthorize("hasAnyRole('USER')")
+//    @PreAuthorize("hasAnyRole('USER')")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴(논리삭제)를 한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<?> delete() {
