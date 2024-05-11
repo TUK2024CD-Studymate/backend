@@ -72,7 +72,7 @@ public class SecurityConfig{
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/logout").permitAll()
-                        .requestMatchers("/subscribe/**").permitAll()
+                        .requestMatchers("/api/subscribe/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement
