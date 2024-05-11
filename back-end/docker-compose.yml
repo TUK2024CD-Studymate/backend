@@ -22,6 +22,7 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      OPENAI_KEY: ${OPENAI_KEY}
     ports:
       - "8080:8080"
     volumes:
