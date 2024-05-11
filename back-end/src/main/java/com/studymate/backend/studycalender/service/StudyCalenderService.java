@@ -2,8 +2,10 @@ package com.studymate.backend.studycalender.service;
 
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.service.MemberService;
-import com.studymate.backend.studycalender.StudyCalenderMapper;
-import com.studymate.backend.studycalender.StudyCalenderRepository;
+import com.studymate.backend.studycalender.domain.CalenderSubject;
+import com.studymate.backend.studycalender.mapper.StudyCalenderMapper;
+import com.studymate.backend.studycalender.repository.CalenderSubjectRepository;
+import com.studymate.backend.studycalender.repository.StudyCalenderRepository;
 import com.studymate.backend.studycalender.StudyCalenderValidator.StudyCalenderValidator;
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
@@ -23,29 +25,33 @@ public class StudyCalenderService {
 
     private final StudyCalenderMapper studyCalenderMapper;
     private final StudyCalenderRepository studyCalenderRepository;
-
+    private final CalenderSubjectRepository calenderSubjectRepository;
     private final MemberService memberService;
     private final StudyCalenderValidator validator;
 
     @Transactional
-    public CalenderResponse createCalender(CalenderCreateRequest request) {
+    public CalenderResponse createCalender(CalenderCreateRequest request, Long id) {
 
         Member member = memberService.getMember();
+        CalenderSubject subject = calenderSubjectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found subject"));
 
         LocalDateTime startTime = request.getStartTime();
         LocalDateTime endTime = request.getEndTime();
 
         validator.timeValidator(startTime, endTime);
 
-        StudyCalender calender = studyCalenderMapper.toEntity(request, member);
+        StudyCalender calender = studyCalenderMapper.toEntity(request, member, subject);
         long seconds = calender.convertSeconds(startTime, endTime);
         calender.setEntireTime(seconds);
+//        calender.confirmStudyClass(subject);
 
         studyCalenderRepository.save(calender);
 
         return studyCalenderMapper.toResponse(calender);
     }
 
+    @Transactional
     public CalenderResponse findOne(Long id) {
 
         Member member = memberService.getMember();
@@ -73,7 +79,7 @@ public class StudyCalenderService {
         long seconds = calender.convertSeconds(startTime, endTime);
         calender.setEntireTime(seconds);
 
-        calender.update(request.getInterests(), request.getStartTime(), request.getEndTime());
+        calender.update(request.getStartTime(), request.getEndTime());
 
         return studyCalenderMapper.toResponse(calender);
     }
@@ -88,6 +94,7 @@ public class StudyCalenderService {
         return "정상적으로 삭제되었습니다.";
     }
 
+    @Transactional
     public CalenderListResponse findAll() {
         Member member = memberService.getMember();
         List<StudyCalender> calenderList = studyCalenderRepository.findAllByMember(member);

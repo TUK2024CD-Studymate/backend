@@ -23,7 +23,6 @@ public class StudyCalender extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "calender_id")
     private Long id;
-    private String studyClass;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalTime entireTime;
@@ -32,8 +31,12 @@ public class StudyCalender extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    public void update( String studyClass, LocalDateTime startTime, LocalDateTime endTime) {
-        this.studyClass = studyClass;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private CalenderSubject calenderSubject;
+
+    public void update(LocalDateTime startTime, LocalDateTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
     }
