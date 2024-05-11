@@ -66,7 +66,7 @@ public class MemberController {
         redisTemplate.opsForValue().set(authentication.getName(), token.getRefreshToken(),
                 token.getRefreshTokenValidationTime(), TimeUnit.MICROSECONDS);
 
-
+        memberService.setActivated(request);
         return ResponseEntity.ok().body(token);
     }
 
