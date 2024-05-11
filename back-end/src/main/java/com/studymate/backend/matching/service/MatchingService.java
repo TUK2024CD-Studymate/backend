@@ -4,7 +4,6 @@ package com.studymate.backend.matching.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studymate.backend.chat.service.ChatService;
-import com.studymate.backend.commons.firebase.PushNotificationService;
 import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
 import com.studymate.backend.matching.dto.JsonMentorResponse;
@@ -28,10 +27,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.KakaoOption;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -48,7 +51,6 @@ public class MatchingService {
     private final NotificationService notificationService;
     private final MemberService memberService;
     private final QuestionRepository questionRepository;
-    private final PushNotificationService pushNotificationService;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
@@ -56,24 +58,22 @@ public class MatchingService {
 
     private final RestTemplate restTemplate;
     private final MemberMapper memberMapper;
-    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토를 출력해. 멘토들의 정보 : ";
-    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토를 선택 한 후에 반환해줘. 반환값의 경우 id값만 출력해 만약 id값이 2개 이상이라면 공백으로 구분해(예시로 가장 일치하는 멘토들의 id가 1,2,5 라면 반환값은 1 2 5)";
+    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 멘토들의 정보 : ";
+    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 반환해줘. 반환값의 경우 id값만 출력해 만약 id값들은 공백으로 구분해(예시로 가장 일치하는 멘토들의 id가 1,2,5,6 이라면 반환값은 1 2 5 6)";
     @Value("${openai.model}")
     private String model;
     @Value("${openai.api.url}")
     private String apiURL;
-
-
-
-
-
-
     @Value("${coolsms.apikey}")
     private String apiKey;
     @Value("${coolsms.apisecret}")
     private String apiSecret;
     @Value("${coolsms.fromnumber}")
     private String fromNumber;
+    @Value("${coolsms.pfId}")
+    private String pfId;
+    @Value("${coolsms.templateId}")
+    private String templateId;
     private static final String pattern = "\\d+(\\s\\d+)*";
 
     public MemberListResponse getMentorList(Long questionId) {
@@ -96,7 +96,6 @@ public class MatchingService {
         return mentorList;
     }
 
-    @Transactional
     public String matchingForSms(Long questionId, Long mentorId) {
         Member member = memberService.getMember();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -121,9 +120,6 @@ public class MatchingService {
             System.out.println(e.getCode());
         }
 
-
-
-
         MatchingSseResponse matchingSseResponse = MatchingSseResponse.builder()
                 .nickname(member.getNickname()) // 사용자 닉네임
                 .question_id(question.getId()) // 게시물 ID
@@ -138,7 +134,7 @@ public class MatchingService {
         chatService.addUserToRoom(chatRoomId, mentorId);
         chatService.addUserToRoom(chatRoomId, question.getMember().getId());
 
-        return mentor.getNickname()+"님에게 전송문자 전송을 하였습니다.";
+        return mentor.getNickname() + "님에게 전송문자 전송을 하였습니다.";
 
     }
 
@@ -150,7 +146,7 @@ public class MatchingService {
         params.put("to", to);
         params.put("text", "[StudyMate]\n"+question.getWriter()+"님께서 "+mentor.getNickname()+"님에게 도움을 요청했어요!\n\n" +
                 "[내용제목] : "+question.getTitle()+"\n[내용상세] :" +question.getContent()+ "\n" +
-                "[채팅 참여링크] : http://studymate-tuk.kro.kr/chat");
+                "[채팅 참여링크] : https://studymate154.com/chat");
         return params;
     }
 
@@ -287,7 +283,7 @@ public class MatchingService {
 
     public List<MemberResponse> getMentorListByAi(Long questionId) {
         List<MemberResponse> memberResponses = new ArrayList<>();
-        // 2
+
         MemberListResponse mentorList = getMentorList(questionId);
 
         Question question = questionRepository.findById(questionId)
@@ -297,7 +293,6 @@ public class MatchingService {
 
         String mentorInfo = convertToJsonString(mentorList);
 
-        // 3
         String message = gptConvert(questionContent, mentorInfo);
         boolean isMatch = patternMatch(message);
 
@@ -370,5 +365,43 @@ public class MatchingService {
         Matcher matcher = compile.matcher(message);
         boolean isMatch = matcher.matches();
         return isMatch;
+    }
+
+    public String sendKakao(Long questionId, Long mentorId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("not found question"));
+
+        Member mentor = memberRepository.findById(mentorId)
+                .orElseThrow(() -> new RuntimeException("not found mentor"));
+
+        Member member = memberService.getMember();
+
+        messageInfo(mentor, question, member);
+        return mentor.getNickname()+"에게 알림톡을 보냈습니다.";
+    }
+
+    public void messageInfo(Member mentor, Question question, Member member) {
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("#{요청자닉네임}", member.getNickname());
+        variables.put("#{멘토닉네임}", mentor.getNickname());
+        variables.put("#{질문제목}", question.getTitle());
+        variables.put("#{질문내용}", question.getContent());
+
+        kakaoMessage(templateId, variables, mentor.getTel());
+    }
+
+    public void kakaoMessage(String templateId, HashMap<String, String> variables, String sendTo){
+        final DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret,"https://api.coolsms.co.kr");
+        KakaoOption kakaoOption = new KakaoOption();
+        kakaoOption.setPfId(pfId);
+        kakaoOption.setTemplateId(templateId);
+        kakaoOption.setVariables(variables);
+
+        net.nurigo.sdk.message.model.Message message = new net.nurigo.sdk.message.model.Message();
+        message.setFrom(fromNumber);
+        message.setTo(sendTo);
+        message.setKakaoOptions(kakaoOption);
+
+        SingleMessageSentResponse response = messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 }
