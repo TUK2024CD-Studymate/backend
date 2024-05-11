@@ -29,4 +29,6 @@ public class MemberResponse {
     private BigDecimal starAverage;
     private int solved;
     private int matchingCount;
+    private int reviewCount;
+    private boolean isLogin;
 }
