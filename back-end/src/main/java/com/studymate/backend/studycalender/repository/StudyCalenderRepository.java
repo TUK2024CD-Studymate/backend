@@ -1,4 +1,4 @@
-package com.studymate.backend.studycalender;
+package com.studymate.backend.studycalender.repository;
 
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.studycalender.domain.StudyCalender;
