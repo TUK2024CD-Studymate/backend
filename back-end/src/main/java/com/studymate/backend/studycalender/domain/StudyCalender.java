@@ -23,7 +23,7 @@ public class StudyCalender extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "calender_id")
     private Long id;
-    private String studyClass;
+    private String subjectName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalTime entireTime;
@@ -32,12 +32,13 @@ public class StudyCalender extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    public void update( String studyClass, LocalDateTime startTime, LocalDateTime endTime) {
-        this.studyClass = studyClass;
+    public void update(LocalDateTime startTime, LocalDateTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
     }
-
+    public void confirmSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
     public long convertSeconds(LocalDateTime startTime, LocalDateTime endTime) {
         Duration time = Duration.between(startTime, endTime);
         return time.toSeconds();
