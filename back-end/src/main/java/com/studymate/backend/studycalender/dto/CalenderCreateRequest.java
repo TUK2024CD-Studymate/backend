@@ -20,10 +20,6 @@ import java.time.LocalDateTime;
 @Schema(description = "Member Create Calender request")
 public class CalenderCreateRequest {
     @NotNull
-    @Schema(description = "스터디 분류", nullable = false, example = "중등수학")
-    private String studyClass;
-
-    @NotNull
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "스터디 시작 시간", nullable = false, example = "2024-02-13 13:50")

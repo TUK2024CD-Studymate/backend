@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CalenderResponse {
     private Long id;
-    private String studyClass;
+    private String subjectName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime startTime;
 

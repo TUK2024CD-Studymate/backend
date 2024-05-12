@@ -1,9 +1,7 @@
 package com.studymate.backend.studycalender.controller;
 
-import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
-import com.studymate.backend.studycalender.dto.CalenderListResponse;
-import com.studymate.backend.studycalender.dto.CalenderResponse;
-import com.studymate.backend.studycalender.dto.CalenderUpdateRequest;
+import com.studymate.backend.studycalender.dto.*;
+import com.studymate.backend.studycalender.service.CalenderSubjectService;
 import com.studymate.backend.studycalender.service.StudyCalenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,12 +19,50 @@ import org.springframework.web.bind.annotation.*;
 public class StudyCalenderController {
 
     private final StudyCalenderService studyCalenderService;
+    private final CalenderSubjectService calenderSubjectService;
 
-    @PostMapping("/calender")
+    @PostMapping("/subject")
+    @Operation(summary = "과목 생성", description = "회원이 스터디 과목을 생성한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<SubjectResponse> createPost(@Valid @RequestBody SubjectCreateRequest request) {
+        return ResponseEntity.ok(calenderSubjectService.createSubject(request));
+    }
+
+    @PostMapping("/subject/{subject-id}")
+    @Operation(summary = "과목 수정", description = "회원이 스터디 과목을 수정한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<SubjectResponse> updateSubject(@Valid @RequestBody SubjectUpdateRequest request,
+                                                         @PathVariable("subject-id") Long id) {
+        return ResponseEntity.ok(calenderSubjectService.update(request, id));
+    }
+
+    @GetMapping("/subject/{subject-id}")
+    @Operation(summary = "과목 조회", description = "회원이 스터디 과목을 단일 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<SubjectResponse> findSubject(@PathVariable("subject-id") Long id) {
+        return ResponseEntity.ok(calenderSubjectService.findOne(id));
+    }
+
+    @GetMapping("/subject")
+    @Operation(summary = "과목 전체 조회", description = "회원이 자신의 스터디 과목을 전체 조회한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<SubjectListResponse> findAllSubject() {
+        return ResponseEntity.ok(calenderSubjectService.findAll());
+    }
+
+    @DeleteMapping("/subject/{subject-id}")
+    @Operation(summary = "과목 삭제", description = "회원이 생성한 과목을 삭제한다.")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+    public ResponseEntity<String> deleteSubject(@PathVariable("subject-id") Long id) {
+        return ResponseEntity.ok(calenderSubjectService.delete(id));
+    }
+
+    @PostMapping("/calender/{subject-id}")
     @Operation(summary = "스터디 기록 생성", description = "회원이 스터디 기록을 생성한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<CalenderResponse> createPost(@Valid @RequestBody CalenderCreateRequest request) {
-        return ResponseEntity.ok(studyCalenderService.createCalender(request));
+    public ResponseEntity<CalenderResponse> createPost(@Valid @RequestBody CalenderCreateRequest request,
+                                                       @PathVariable("subject-id") Long id) {
+        return ResponseEntity.ok(studyCalenderService.createCalender(request, id));
     }
 
     @GetMapping("/calender/{calender_id}")

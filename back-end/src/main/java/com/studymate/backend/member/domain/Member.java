@@ -119,7 +119,8 @@ public class Member extends BaseTimeEntity{
         this.matchingCount++;
     }
     public void setStarAverage(int reviewCount) {
-        this.starAverage = BigDecimal.valueOf(this.star).divide(BigDecimal.valueOf(reviewCount),2, RoundingMode.HALF_UP);
+        this.starAverage = BigDecimal.valueOf(this.star).
+                divide(BigDecimal.valueOf(reviewCount),2, RoundingMode.HALF_UP);
     }
 
     public void subSolved() {
