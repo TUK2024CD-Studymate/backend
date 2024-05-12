@@ -1,6 +1,7 @@
-package com.studymate.backend.studycalender;
+package com.studymate.backend.studycalender.mapper;
 
 import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.studycalender.domain.CalenderSubject;
 import com.studymate.backend.studycalender.domain.StudyCalender;
 import com.studymate.backend.studycalender.dto.CalenderCreateRequest;
 import com.studymate.backend.studycalender.dto.CalenderListResponse;
@@ -15,12 +16,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudyCalenderMapper {
 
-    public StudyCalender toEntity(CalenderCreateRequest request, Member member) {
+    public StudyCalender toEntity(CalenderCreateRequest request, Member member, CalenderSubject subject) {
 
         return StudyCalender.builder()
                 .endTime(request.getEndTime())
-                .studyClass(request.getStudyClass())
                 .startTime(request.getStartTime())
+                .subjectName(subject.getSubjectName())
                 .member(member)
                 .build();
     }
@@ -30,8 +31,8 @@ public class StudyCalenderMapper {
         return CalenderResponse.builder()
                 .id(studyCalender.getId())
                 .endTime(studyCalender.getEndTime())
-                .studyClass(studyCalender.getStudyClass())
                 .startTime(studyCalender.getStartTime())
+                .subjectName(studyCalender.getSubjectName())
                 .entireTime(studyCalender.serializeTime(studyCalender.getEntireTime()))
                 .build();
     }
