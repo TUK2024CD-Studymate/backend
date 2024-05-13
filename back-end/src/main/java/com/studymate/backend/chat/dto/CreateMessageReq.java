@@ -14,4 +14,5 @@ public class CreateMessageReq {
     private Long chatRoomId;
     private ChatMessage.MessageType type;  // 메시지 타입 필드 추가
 
+
 }

@@ -16,7 +16,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage extends BaseTimeEntity {
-
     // 메시지 타입 : 입장, 채팅
     public enum MessageType {
         ENTER, TALK
