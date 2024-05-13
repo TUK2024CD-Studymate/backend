@@ -1,16 +1,14 @@
 package com.studymate.backend.chat.controller;
 
 import com.studymate.backend.chat.domain.ChatRoom;
-import com.studymate.backend.chat.domain.UserChatRoom;
 import com.studymate.backend.chat.dto.ChatMessageRes;
 import com.studymate.backend.chat.dto.ChatRoomRes;
 import com.studymate.backend.chat.dto.CreateChatRoom;
 import com.studymate.backend.chat.service.ChatService;
+import com.studymate.backend.chat.service.MessageService;
 import com.studymate.backend.config.security.jwt.TokenProvider;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
-import com.studymate.backend.member.domain.UserDetail;
-import com.studymate.backend.member.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +33,7 @@ public class ChatController {
     private final ChatService chatService;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final MessageService messageService;
 
     @Operation(summary = "chatroom create", description = "채팅방 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
@@ -70,6 +70,30 @@ public class ChatController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomRes);
+    }
+
+    @Transactional
+    @GetMapping("/api/chat/rooms/{chatRoomId}/enter")
+    public ResponseEntity<?> enterChatRoom(@PathVariable Long chatRoomId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+        Member member = memberRepository.findByEmail(email);
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Member not found");
+        }
+
+        // 채팅방 정보와 메시지 목록 조회
+        List<ChatMessageRes> messages = chatService.findChatMessage(chatRoomId, member.getId());
+        if (!messages.isEmpty()) {
+            ChatMessageRes lastMessage = messages.get(messages.size() - 1);
+            String lastMessageId = lastMessage.getMessageId().toString();  // 메시지 ID 게터 메소드 호출
+
+            // 사용자 읽음 마커 업데이트
+            messageService.updateUserReadPosition(chatRoomId.toString(), member.getId().toString(), lastMessageId);
+        }
+
+        return ResponseEntity.ok().body(messages);
     }
 
 
