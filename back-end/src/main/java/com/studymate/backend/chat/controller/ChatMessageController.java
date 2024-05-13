@@ -1,7 +1,10 @@
 package com.studymate.backend.chat.controller;
 
+import com.studymate.backend.chat.domain.ChatMessage;
+import com.studymate.backend.chat.dto.ChatMessageRes;
 import com.studymate.backend.chat.dto.CreateMessageReq;
 import com.studymate.backend.chat.service.ChatService;
+import com.studymate.backend.chat.service.MessageService;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.MemberRepository;
 import lombok.AccessLevel;
@@ -18,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -26,6 +30,7 @@ import java.util.Objects;
 public class ChatMessageController {
     private final ChatService chatService;
     private final MemberRepository memberRepository;
+    private final MessageService messageService;
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
@@ -44,8 +49,21 @@ public class ChatMessageController {
             return;
         }
 
-        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoomId, messageRequest);
-        chatService.saveMessage(member, chatRoomId, messageRequest);
+
+        if (messageRequest.getType() == ChatMessage.MessageType.ENTER) {
+            // 사용자가 채팅방에 입장했을 때 필요한 로직 수행
+            List<ChatMessageRes> messages = chatService.findChatMessage(chatRoomId, member.getId());
+            if (!messages.isEmpty()) {
+                ChatMessageRes lastMessage = messages.get(messages.size() - 1);
+                String lastMessageId = lastMessage.getMessageId().toString();
+                messageService.updateUserReadPosition(chatRoomId.toString(), member.getId().toString(), lastMessageId);
+            }
+//            messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoomId, messages);
+        } else {
+            // 기존 채팅 메시지 전송 로직
+            messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoomId, messageRequest);
+            chatService.saveMessage(member, chatRoomId, messageRequest);
+        }
         log.info("Message [{}] sent by user: {} to chat room: {}", messageRequest.getContent(), email, chatRoomId);
     }
 }
