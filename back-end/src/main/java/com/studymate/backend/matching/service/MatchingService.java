@@ -56,11 +56,8 @@ public class MatchingService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final ChatService chatService;
-
     private final RestTemplate restTemplate;
     private final MemberMapper memberMapper;
-    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 멘토들의 정보 : ";
-    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 반환해줘. 반환값의 경우 id값만 출력해 만약 id값들은 공백으로 구분해(예시로 가장 일치하는 멘토들의 id가 1,2,5,6 이라면 반환값은 1 2 5 6)";
     @Value("${openai.model}")
     private String model;
     @Value("${openai.api.url}")
@@ -76,6 +73,8 @@ public class MatchingService {
     @Value("${coolsms.templateId}")
     private String templateId;
     private static final String pattern = "\\d+(\\s\\d+)*";
+    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 멘토들의 정보 : ";
+    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 반환해줘. 반환값의 경우 id값들을 공백으로 구분지어 출력해"+pattern+"이 형식이야.";
 
     public MemberListResponse getMentorList(Long questionId) {
         Member member = memberService.getMember();
