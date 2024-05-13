@@ -28,18 +28,18 @@ public class StudyCalenderController {
         return ResponseEntity.ok(calenderSubjectService.createSubject(request));
     }
 
-    @PostMapping("/subject/{subject-id}")
+    @PostMapping("/subject/{subject_id}")
     @Operation(summary = "과목 수정", description = "회원이 스터디 과목을 수정한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<SubjectResponse> updateSubject(@Valid @RequestBody SubjectUpdateRequest request,
-                                                         @PathVariable("subject-id") Long id) {
+                                                         @PathVariable("subject_id") Long id) {
         return ResponseEntity.ok(calenderSubjectService.update(request, id));
     }
 
-    @GetMapping("/subject/{subject-id}")
+    @GetMapping("/subject/{subject_id}")
     @Operation(summary = "과목 조회", description = "회원이 스터디 과목을 단일 조회한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<SubjectResponse> findSubject(@PathVariable("subject-id") Long id) {
+    public ResponseEntity<SubjectResponse> findSubject(@PathVariable("subject_id") Long id) {
         return ResponseEntity.ok(calenderSubjectService.findOne(id));
     }
 
@@ -50,18 +50,18 @@ public class StudyCalenderController {
         return ResponseEntity.ok(calenderSubjectService.findAll());
     }
 
-    @DeleteMapping("/subject/{subject-id}")
+    @DeleteMapping("/subject/{subject_id}")
     @Operation(summary = "과목 삭제", description = "회원이 생성한 과목을 삭제한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> deleteSubject(@PathVariable("subject-id") Long id) {
+    public ResponseEntity<String> deleteSubject(@PathVariable("subject_id") Long id) {
         return ResponseEntity.ok(calenderSubjectService.delete(id));
     }
 
-    @PostMapping("/calender/{subject-id}")
+    @PostMapping("/calender/{subject_id}")
     @Operation(summary = "스터디 기록 생성", description = "회원이 스터디 기록을 생성한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     public ResponseEntity<CalenderResponse> createPost(@Valid @RequestBody CalenderCreateRequest request,
-                                                       @PathVariable("subject-id") Long id) {
+                                                       @PathVariable("subject_id") Long id) {
         return ResponseEntity.ok(studyCalenderService.createCalender(request, id));
     }
 
