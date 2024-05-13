@@ -13,6 +13,7 @@ import com.studymate.backend.chat.repository.UserChatRoomRepository;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -29,6 +31,9 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMapper chatMapper;
     private final MemberRepository memberRepository;
+    private final MessageService messageService;
+
+
 
 
     @Transactional
@@ -79,8 +84,9 @@ public class ChatService {
             List<Member> otherMembers = allMembers.stream()
                     .filter(m -> !m.getId().equals(memberId))
                     .collect(Collectors.toList());
+            Long unreadMessageCount = countUnreadMessages(chatRoom.getId(), memberId); // 읽지 않은 메시지 수 계산
 
-            ChatRoomRes chatRoomRes = chatMapper.toChatRoomDto(chatRoom, otherMembers);
+            ChatRoomRes chatRoomRes = chatMapper.toChatRoomDto(chatRoom, otherMembers, unreadMessageCount); // 수정된 메소드 호출
             chatRoomResList.add(chatRoomRes);
         }
         return chatRoomResList;
@@ -94,18 +100,35 @@ public class ChatService {
         ChatMessage message = chatMapper.toChatMessage(sender, chatRoom, createMessageReq);
 
         chatMessageRepository.save(message);
+        log.info("메시지가 저장됐습니다.");
     }
+
+    public Long countUnreadMessages(Long chatRoomId, Long memberId) {
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
+        String lastReadMessageId = messageService.getUserLastReadPosition(chatRoomId.toString(), memberId.toString());
+        long lastReadId = lastReadMessageId != null ? Long.parseLong(lastReadMessageId) : 0;
+
+        return chatMessages.stream()
+                .filter(msg -> msg.getId() > lastReadId && !msg.getMember().getId().equals(memberId))
+                .count();
+    }
+
 
     @Transactional
-    public List<ChatMessageRes> findChatMessage(Long chatRoomId) {
+    public List<ChatMessageRes> findChatMessage(Long chatRoomId, Long memberId) {
         List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
-
-        return chatMapper.toChatMessageList(chatMessages);
+        messageService.updateUserReadPosition(chatRoomId.toString(), memberId.toString(), getLastMessageId(chatMessages));
+        // 다시 메시지를 로드하거나, 업데이트가 반영되기를 기다린 후 메시지 목록을 반환
+        chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
+        String lastReadMessageId = messageService.getUserLastReadPosition(chatRoomId.toString(), memberId.toString());
+        return chatMapper.toChatMessageList(chatMessages, lastReadMessageId);
     }
 
-//    public List<ChatRoomRes> findChatRoom() {
-//        List<UserChatRoom> chatRooms = userChatRoomRepository.findAll();
-//
-//        return chatMapper.toChatRoomList(chatRooms);
-//    }
+    private String getLastMessageId(List<ChatMessage> messages) {
+        if (!messages.isEmpty()) {
+            return messages.get(messages.size() - 1).getId().toString();
+        }
+        return "";
+    }
+
 }
