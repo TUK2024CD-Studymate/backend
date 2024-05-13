@@ -14,6 +14,7 @@ public class ChatRoomRes {
     private Long chatRoomId;
     private String chatRoomName;
     private List<MemberDetail> members; // 채팅방 멤버 정보
+    private Long unreadMessageCount; // 읽지 않은 메시지 수 추가
 
     @Getter
     @Setter
