@@ -2,7 +2,8 @@ package com.studymate.backend.chat.controller;
 
 import com.studymate.backend.chat.dto.CreateMessageReq;
 import com.studymate.backend.chat.service.ChatService;
-import com.studymate.backend.member.domain.UserDetail;
+import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.member.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 
 import java.util.Objects;
@@ -22,6 +25,7 @@ import java.util.Objects;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessageController {
     private final ChatService chatService;
+    private final MemberRepository memberRepository;
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
@@ -30,14 +34,18 @@ public class ChatMessageController {
     public void chat(StompHeaderAccessor headerAccessor,
                      @DestinationVariable Long chatRoomId,
                      @Payload CreateMessageReq messageRequest) {
-        UserDetail userDetail = (UserDetail) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userDetail");
+        Authentication authentication = (Authentication) Objects.requireNonNull(headerAccessor.getUser());
+        User user = (User) authentication.getPrincipal();
+        String email = user.getUsername();
+        Member member = memberRepository.findByEmail(email);
 
-//        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, messageRequest);
-        messagingTemplate.convertAndSend("/sub/chat/room/" + messageRequest.getChatRoomId(), messageRequest);
+        if (member == null) {
+            log.warn("Failed to find member with email: {}", email);
+            return;
+        }
 
-        chatService.saveMessage(userDetail.getMember(), chatRoomId, messageRequest);
-        log.info("Message [{}] send by user: {} to chatting room: {}", messageRequest.getContent(), messageRequest.getSender(), chatRoomId);
+        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoomId, messageRequest);
+        chatService.saveMessage(member, chatRoomId, messageRequest);
+        log.info("Message [{}] sent by user: {} to chat room: {}", messageRequest.getContent(), email, chatRoomId);
     }
-
-    // 메세지가 큐에 도착할 때 실행 - rabbitmq 연결
 }
