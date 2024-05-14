@@ -72,29 +72,29 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomRes);
     }
 
-    @Transactional
-    @GetMapping("/api/chat/rooms/{chatRoomId}/enter")
-    public ResponseEntity<?> enterChatRoom(@PathVariable Long chatRoomId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
-        Member member = memberRepository.findByEmail(email);
-
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Member not found");
-        }
-
-        // 채팅방 정보와 메시지 목록 조회
-        List<ChatMessageRes> messages = chatService.findChatMessage(chatRoomId, member.getId());
-        if (!messages.isEmpty()) {
-            ChatMessageRes lastMessage = messages.get(messages.size() - 1);
-            String lastMessageId = lastMessage.getMessageId().toString();  // 메시지 ID 게터 메소드 호출
-
-            // 사용자 읽음 마커 업데이트
-            messageService.updateUserReadPosition(chatRoomId.toString(), member.getId().toString(), lastMessageId);
-        }
-
-        return ResponseEntity.ok().body(messages);
-    }
+//    @Transactional
+//    @GetMapping("/api/chat/rooms/{chatRoomId}/enter")
+//    public ResponseEntity<?> enterChatRoom(@PathVariable Long chatRoomId) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
+//        Member member = memberRepository.findByEmail(email);
+//
+//        if (member == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Member not found");
+//        }
+//
+//        // 채팅방 정보와 메시지 목록 조회
+//        List<ChatMessageRes> messages = chatService.findChatMessage(chatRoomId, member.getId());
+//        if (!messages.isEmpty()) {
+//            ChatMessageRes lastMessage = messages.get(messages.size() - 1);
+//            String lastMessageId = lastMessage.getMessageId().toString();  // 메시지 ID 게터 메소드 호출
+//
+//            // 사용자 읽음 마커 업데이트
+//            messageService.updateUserReadPosition(chatRoomId.toString(), member.getId().toString(), lastMessageId);
+//        }
+//
+//        return ResponseEntity.ok().body(messages);
+//    }
 
 
     @Transactional
