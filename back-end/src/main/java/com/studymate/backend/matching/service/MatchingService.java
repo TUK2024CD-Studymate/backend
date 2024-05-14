@@ -73,8 +73,8 @@ public class MatchingService {
     @Value("${coolsms.templateId}")
     private String templateId;
     private static final String pattern = "\\d+(\\s\\d+)*";
-    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 멘토들의 정보 : ";
-    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 반환해줘. 반환값의 경우 id값들을 공백으로 구분지어 출력해"+pattern+"이 형식이야.";
+    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 출력 값은 멘토 id를 관련성에 따라 정렬하여 공백으로 구분지어 출력해"+pattern+"이 형식이야. 멘토들의 정보 : ";
+    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 관련성대로 순차적으로 정렬해";
 
     public MemberListResponse getMentorList(Long questionId) {
         Member member = memberService.getMember();
@@ -291,9 +291,11 @@ public class MatchingService {
 
         String questionContent = question.getContent();
 
+        Interests interests = question.getInterests();
+
         String mentorInfo = convertToJsonString(mentorList);
 
-        String message = gptConvert(questionContent, mentorInfo);
+        String message = gptConvert(questionContent, mentorInfo, interests);
         boolean isMatch = patternMatch(message);
 
         log.info("content:{}",message);
@@ -302,7 +304,7 @@ public class MatchingService {
         // 형식 검증 로직
         if (!isMatch) {
             while (!isMatch) {
-                message = gptConvert(questionContent, mentorInfo);
+                message = gptConvert(questionContent, mentorInfo, interests);
                 isMatch = patternMatch(message);
                 log.info("Change message :{}",message);
                 log.info("Change isMatch:{}",isMatch);
@@ -352,12 +354,24 @@ public class MatchingService {
         }
     }
 
-    public String gptConvert(String questionContent, String mentorInfo) {
-        GPTRequest gptRequest = new GPTRequest(model, questionContent+FIRST+mentorInfo+FINAL,
-                1, 256, 1, 2, 2);
-        GPTResponse response = restTemplate.postForObject(apiURL, gptRequest, GPTResponse.class);
+    public String gptConvert(String questionContent, String mentorInfo, Interests interests) {
+        Member member = memberRepository.findById(406L).orElseThrow(() -> new RuntimeException("not found PH"));
+        Long id = member.getId();
+        String pr = member.getPublicRelations();
+        String ex = member.getExpertiseField();
+        if (interests==Interests.WEBAPP) {
+            GPTRequest gptRequest = new GPTRequest(model, questionContent+FIRST+id+pr+ex+mentorInfo+FINAL,
+                    1, 4000, 1, 2, 2);
+            GPTResponse response = restTemplate.postForObject(apiURL, gptRequest, GPTResponse.class);
+            return response.getChoices().get(0).getMessage().getContent();
 
-        return response.getChoices().get(0).getMessage().getContent();
+        }else {
+            GPTRequest gptRequest = new GPTRequest(model, questionContent + FIRST + mentorInfo + FINAL,
+                    1, 4000, 1, 2, 2);
+            GPTResponse response = restTemplate.postForObject(apiURL, gptRequest, GPTResponse.class);
+            return response.getChoices().get(0).getMessage().getContent();
+
+        }
     }
 
     public boolean patternMatch(String message) {
