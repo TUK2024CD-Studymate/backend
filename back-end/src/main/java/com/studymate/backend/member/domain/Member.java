@@ -63,8 +63,6 @@ public class Member extends BaseTimeEntity{
     private Interests interests;
     @Column(unique = true)
     private String nickname;
-//    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
-//    private ProfileImg profileUrl;
     @Column
     private Boolean isDeleted;
     @Column
