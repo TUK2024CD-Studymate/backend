@@ -15,23 +15,10 @@ public class ProfileImg extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "img_id")
     private Long id;
-
-    private String name;
-
-    private String type;
-
-    @Lob
-    @Column(name = "imagedata", length = 1000)
-    private byte[] imageData;
-
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private Member member;
-
-    public void upload(String name, String type, byte[] imageData){
-        this.name = name;
-        this.type = type;
-        this.imageData = imageData;
-    }
+    @Column(length = 1000)
+    private String url;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Member member;
 }
 
