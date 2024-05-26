@@ -79,3 +79,16 @@ openai:
     key: ${OPENAI_KEY}
     url: https://api.openai.com/v1/chat/completions
   model: gpt-3.5-turbo
+
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET}
+    credentials:
+      access-key: ${ACCESSKEY}
+      secret-key: ${SECRETKEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false

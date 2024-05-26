@@ -21,7 +21,7 @@ public class MemberResponse {
     private String tel;
     private String expertiseField;
     private Interests interests;
-//    private String imageUrl;
+    private String imageUrl;
     private String blogUrl;
     private String publicRelations;
     private String job;

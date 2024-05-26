@@ -1,6 +1,7 @@
 package com.studymate.backend.member;
 
 import com.studymate.backend.file.ProfileImgRepository;
+import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.domain.Authority;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.dto.MemberListResponse;
@@ -13,15 +14,14 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class MemberMapper {
-
     private final PasswordEncoder passwordEncoder;
     private final ProfileImgRepository profileImgRepository;
-
     public Member toEntity(MemberRequest request) {
 
         Authority authority = Authority.builder().
@@ -56,11 +56,14 @@ public class MemberMapper {
     }
 
     public MemberResponse toResponse(Member member) {
+        String imageName = "프로필 사진이 없습니다";
 
         if (member == null) return null;
 
-//        ProfileImg image = profileImgRepository.findByMember(member);
-//        String imageName = image.getName();
+        if (profileImgRepository.findByMember(member).isPresent()) {
+            Optional<ProfileImg> profileImg = profileImgRepository.findByMember(member);
+            imageName = profileImg.get().getUrl();
+        }
 
         return MemberResponse.builder()
                 .id(member.getId())
@@ -68,7 +71,7 @@ public class MemberMapper {
                 .part(member.getPart())
                 .nickname(member.getNickname())
                 .interests(member.getInterests())
-//                .imageUrl(imageName)
+                .imageUrl(imageName)
                 .name(member.getName())
                 .blogUrl(member.getBlogUrl())
                 .reviewCount(member.getReviewCount())
