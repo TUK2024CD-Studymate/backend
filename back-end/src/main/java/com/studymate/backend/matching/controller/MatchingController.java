@@ -1,5 +1,6 @@
 package com.studymate.backend.matching.controller;
 
+import com.studymate.backend.matching.dto.MatchingMemberResponse;
 import com.studymate.backend.matching.service.MatchingService;
 import com.studymate.backend.member.dto.MemberListResponse;
 import com.studymate.backend.member.dto.MemberResponse;
@@ -62,7 +63,7 @@ public class MatchingController {
     @GetMapping("/matching/keyword/ai/{question-id}")
     @Operation(summary = "멘토 조회(AI)", description = "GPT를 사용 및 분석해서 멘토들을 조회한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<List<MemberResponse>> getMentorAi(@PathVariable("question-id") Long questionId) {
+    public ResponseEntity<List<MatchingMemberResponse>> getMentorAi(@PathVariable("question-id") Long questionId) {
         return ResponseEntity.ok().body(matchingService.getMentorListByAi(questionId));
     }
 }
