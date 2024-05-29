@@ -6,9 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.studymate.backend.chat.service.ChatService;
 import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
+import com.studymate.backend.matching.MatchingMemberMapper;
 import com.studymate.backend.matching.dto.JsonMentorResponse;
+import com.studymate.backend.matching.dto.MatchingMemberResponse;
 import com.studymate.backend.matching.dto.MatchingSseResponse;
-import com.studymate.backend.member.MemberMapper;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Member;
@@ -57,7 +58,7 @@ public class MatchingService {
     private final ReviewMapper reviewMapper;
     private final ChatService chatService;
     private final RestTemplate restTemplate;
-    private final MemberMapper memberMapper;
+    private final MatchingMemberMapper memberMapper;
     @Value("${openai.model}")
     private String model;
     @Value("${openai.api.url}")
@@ -72,9 +73,11 @@ public class MatchingService {
     private String pfId;
     @Value("${coolsms.templateId}")
     private String templateId;
-    private static final String pattern = "\\d+(\\s\\d+)*";
-    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 출력 값은 멘토 id를 관련성에 따라 정렬하여 공백으로 구분지어 출력해"+pattern+"이 형식이야. 멘토들의 정보 : ";
-    private final static String FINAL = "이제 여기서 가장 질문과 맞는 멘토들 4명 이상을 선택 한 후에 관련성대로 순차적으로 정렬해";
+    private static final String pattern = "(\\d+\\s\\d+\\.\\d+)(\\s\\d+\\s\\d+\\.\\d+)*";
+
+    private final static String FIRST = "이건 질문자가 질문한 내용인데 이 내용을 기반으로 가장 적절한 멘토들(4명이상)을 출력해. 출력 값은 멘토 id를 관련성에 따라 정렬하여 공백으로 구분지어 출력해 " +
+            "또한 id 옆에는 질문의 내용과 멘토의 정보가 얼마나 일치하는지 퍼센트형식으로 소수점 첫째자리까지만 출력해 즉, 출력 형식은"+pattern+"이 된다는 이야기야. 멘토들의 정보 : ";
+    private final static String FINAL = "이제 여기서 가장 질문과 일치하는 50퍼센트 이상의 멘토들 4명 이상을 선택 한 후에 관련성대로 순차적으로 정렬해";
 
     public MemberListResponse getMentorList(Long questionId) {
         Member member = memberService.getMember();
@@ -281,8 +284,9 @@ public class MatchingService {
         return lps;
     }
 
-    public List<MemberResponse> getMentorListByAi(Long questionId) {
-        List<MemberResponse> memberResponses = new ArrayList<>();
+    public List<MatchingMemberResponse> getMentorListByAi(Long questionId) {
+        Map<Long, Double> mentorMatchMap = new HashMap<>();
+        List<MatchingMemberResponse> memberResponses = new ArrayList<>();
 
         MemberListResponse mentorList = getMentorList(questionId);
 
@@ -301,33 +305,49 @@ public class MatchingService {
         log.info("content:{}",message);
         log.info("isMatch:{}",isMatch);
 
-        // 형식 검증 로직
-        if (!isMatch) {
-            while (!isMatch) {
+        boolean hasLowMatch = true;
+
+        // 정규표현식 검증 로직 + 멘토 일치률 검증
+        while (!isMatch || hasLowMatch) {
+            if (!isMatch) {
                 message = gptConvert(questionContent, mentorInfo, interests);
                 isMatch = patternMatch(message);
-                log.info("Change message :{}",message);
-                log.info("Change isMatch:{}",isMatch);
+                log.info("Change message :{}", message);
+                log.info("Change isMatch:{}", isMatch);
+            } else {
+                Pattern compile = Pattern.compile("(\\d+)\\s(\\d+\\.\\d+)");
+                Matcher matcher = compile.matcher(message);
+                hasLowMatch = false;
+                mentorMatchMap.clear();
+
+                while (matcher.find()) {
+                    Long mentorId = Long.parseLong(matcher.group(1));
+                    double matchPercentage = Double.parseDouble(matcher.group(2));
+                    if (matchPercentage < 50) {
+                        hasLowMatch = true;
+                        break;
+                    }
+                    mentorMatchMap.put(mentorId, matchPercentage);
+                }
+                if (hasLowMatch) {
+                    message = gptConvert(questionContent, mentorInfo, interests);
+                    isMatch = patternMatch(message);
+                    log.info("Retrying due to low match, message :{}", message);
+                    log.info("isMatch:{}", isMatch);
+                }
             }
         }
+        for (Map.Entry<Long, Double> entry : mentorMatchMap.entrySet()) {
+            log.info("memberId: {}", entry.getKey());
+            log.info("memberPercent: {}", entry.getValue());
 
-        String[] parts = message.split(" ");
-        long[] numbers = new long[parts.length];
-
-        log.info("numbers:{}", numbers);
-
-        for (int i = 0; i < parts.length; i++) {
-            numbers[i] = Long.parseLong(parts[i]); // 각 부분을 정수로 변환하여 저장
-        }
-
-        for (long number : numbers) {
-            Member member = memberRepository.findById(number)
+            Long mentorId = entry.getKey();
+            Double mentorPercent = entry.getValue();
+            Member member = memberRepository.findById(mentorId)
                     .orElseThrow(() -> new RuntimeException("not found member"));
-
-            MemberResponse memberResponse = memberMapper.toResponse(member);
-            memberResponses.add(memberResponse);
+            MatchingMemberResponse matchingMemberResponse = memberMapper.toResponse(member, mentorPercent);
+            memberResponses.add(matchingMemberResponse);
         }
-
         return memberResponses;
     }
 
