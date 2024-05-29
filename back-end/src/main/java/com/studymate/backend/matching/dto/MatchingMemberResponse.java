@@ -32,5 +32,5 @@ public class MatchingMemberResponse {
     private int matchingCount;
     private int reviewCount;
     private boolean isLogin;
-    private float matchingPercent;
+    private Double matchingPercent;
 }
