@@ -21,6 +21,7 @@ public class ReviewResponse {
     private int star;
     private Boolean isSolved;
     private Boolean heart;
+    private String imageUrl;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createAt;
 }
