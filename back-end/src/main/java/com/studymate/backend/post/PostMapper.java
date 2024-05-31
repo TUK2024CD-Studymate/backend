@@ -1,6 +1,8 @@
 package com.studymate.backend.post;
 
 import com.studymate.backend.comment.service.CommentService;
+import com.studymate.backend.file.ProfileImgRepository;
+import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.domain.Category;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.post.domain.Post;
@@ -9,10 +11,13 @@ import com.studymate.backend.post.dto.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class PostMapper {
     private final CommentService commentService;
+    private final ProfileImgRepository profileImgRepository;
 
     public Post toEntity(PostRequestDto request, Member member) {
         return Post.builder()
@@ -28,6 +33,7 @@ public class PostMapper {
     }
 
     public PostResponseDto toResponse(Post post) {
+        String profileUrl = "프로필 사진이 없습니다.";
         if (post == null) return null;
 
         // 댓글 수 조회
@@ -35,10 +41,16 @@ public class PostMapper {
         Member member = post.getMember();
         String nickname = (member != null) ? member.getNickname() : null;
 
+        if (profileImgRepository.findByMember(post.getMember()).isPresent()) {
+            Optional<ProfileImg> profileImg = profileImgRepository.findByMember(post.getMember());
+            profileUrl = profileImg.get().getUrl();
+        }
+
         return PostResponseDto.builder()
                 .post_id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .profileUrl(profileUrl)
                 .category(post.getCategory())
                 .likeCount(post.getLikeCount())
                 .createdAt(post.getCreatedAt()) // 날짜 포맷은 필요에 따라 변경
@@ -48,5 +60,4 @@ public class PostMapper {
                 .commentCount(commentCount) // 댓글 수 추가
                 .build();
     }
-
 }

@@ -2,6 +2,7 @@ package com.studymate.backend.comment.dto.response;
 
 import com.studymate.backend.comment.domain.Comment;
 import com.studymate.backend.comment.repository.CommentRepository;
+import com.studymate.backend.file.ProfileImgRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +13,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentListResponse {
     private final CommentRepository commentRepository;
+    private final ProfileImgRepository profileImgRepository;
 
     public List<CommentResponse> getList(Long postId){
         List<Comment> comments = commentRepository.findByPostId(postId);
         return comments.stream()
-                .map(CommentResponse::toResponse)
+                .map(comment -> CommentResponse.toResponse(comment,profileImgRepository))
                 .collect(Collectors.toList());
     }
 }

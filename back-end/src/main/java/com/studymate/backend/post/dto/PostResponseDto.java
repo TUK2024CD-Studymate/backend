@@ -19,6 +19,8 @@ public class PostResponseDto {
 
     private String content;
 
+    private String profileUrl;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
@@ -33,5 +35,4 @@ public class PostResponseDto {
     private Boolean recruitmentStatus;
 
     private Long commentCount;
-
 }

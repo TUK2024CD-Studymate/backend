@@ -2,12 +2,15 @@ package com.studymate.backend.comment.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.studymate.backend.comment.domain.Comment;
+import com.studymate.backend.file.ProfileImgRepository;
+import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Builder
@@ -17,6 +20,8 @@ public class CommentResponse {
 
     private String content;
 
+    private String profileUrl;
+
     private String nickname;
 
     private Long post_id;
@@ -24,15 +29,22 @@ public class CommentResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
-    public static CommentResponse toResponse(Comment comment){
-        if(comment == null) return null;
+    public static CommentResponse toResponse(Comment comment, ProfileImgRepository profileImgRepository) {
+        String profileUrl = "프로필 사진이 없습니다.";
+        if (comment == null) return null;
 
         Member member = comment.getMember();
         String nickname = (member != null) ? member.getNickname() : null;
 
+        if (profileImgRepository.findByMember(member).isPresent()) {
+            Optional<ProfileImg> profileImg = profileImgRepository.findByMember(member);
+            profileUrl = profileImg.get().getUrl();
+        }
+
         return CommentResponse.builder()
                 .comment_id(comment.getId())
                 .content(comment.getContent())
+                .profileUrl(profileUrl)
                 .nickname(nickname)
                 .post_id(comment.getPost().getId())
                 .createdAt(comment.getCreatedAt())
