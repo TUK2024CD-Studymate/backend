@@ -7,6 +7,7 @@ import com.studymate.backend.comment.dto.response.CommentListResponse;
 import com.studymate.backend.comment.dto.response.CommentResponse;
 import com.studymate.backend.comment.dto.response.CommentSseResponse;
 import com.studymate.backend.comment.repository.CommentRepository;
+import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.member.service.MemberService;
 import com.studymate.backend.notification.service.NotificationService;
@@ -28,6 +29,7 @@ public class CommentService {
     private final CommentServiceValidator serviceValidator;
     private final CommentListResponse commentListResponse;
     private final NotificationService notificationService;
+    private final ProfileImgRepository profileImgRepository;
     // 댓글 생성
     @Transactional
     public CommentResponse save(CommentRequest request, Post post) {
@@ -47,7 +49,7 @@ public class CommentService {
         // 게시물 작성자에게 알림 보내기
         notificationService.customNotify(post.getMember(), commentSseResponse, notificationMessage, "Comment");
 
-        return CommentResponse.toResponse(savedComment);
+        return CommentResponse.toResponse(savedComment, profileImgRepository);
     }
 
     // 해당 게시글의 댓글 조회
