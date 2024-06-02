@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/image")
+@RequestMapping("/api/image")
 @Tag(name = "회원", description = "회원 API")
 public class ProfileImgController {
     private final S3UploadService s3UploadService;
