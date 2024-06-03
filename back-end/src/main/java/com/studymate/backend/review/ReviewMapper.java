@@ -6,10 +6,13 @@ import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.review.domain.Review;
 import com.studymate.backend.review.dto.ReviewCreateRequest;
 import com.studymate.backend.review.dto.ReviewResponse;
+import com.studymate.backend.review.dto.ReviewResponseList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -45,6 +48,16 @@ public class ReviewMapper {
                 .heart(review.getHeart())
                 .star(review.getStar())
                 .createAt(review.getCreatedAt())
+                .build();
+    }
+
+    public ReviewResponseList toListResponse(List<Review> reviewList) {
+        List<ReviewResponse> reviewResponses = reviewList.stream()
+                .map(this::toResponse).collect(Collectors.toList());
+        
+        return ReviewResponseList.builder()
+                .reviewResponses(reviewResponses)
+                .reviewCount(reviewList.size())
                 .build();
     }
 }
