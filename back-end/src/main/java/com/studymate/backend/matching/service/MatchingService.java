@@ -23,7 +23,7 @@ import com.studymate.backend.question.domain.Question;
 import com.studymate.backend.review.ReviewMapper;
 import com.studymate.backend.review.ReviewRepository;
 import com.studymate.backend.review.domain.Review;
-import com.studymate.backend.review.dto.ReviewResponse;
+import com.studymate.backend.review.dto.ReviewResponseList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
@@ -153,16 +153,13 @@ public class MatchingService {
         return params;
     }
 
-    public List<ReviewResponse> searchMentorReview(Long mentorId) {
+    public ReviewResponseList searchMentorReview(Long mentorId) {
         Member mentor = memberRepository.findById(mentorId)
                 .orElseThrow(() -> new RuntimeException("not found mentor id"));
 
         List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
 
-        List<ReviewResponse> reviewResponses = reviews.stream().map(reviewMapper::toResponse)
-                .toList();
-
-        return reviewResponses;
+        return reviewMapper.toListResponse(reviews);
     }
 
     /**
@@ -345,7 +342,8 @@ public class MatchingService {
             Double mentorPercent = entry.getValue();
             Member member = memberRepository.findById(mentorId)
                     .orElseThrow(() -> new RuntimeException("not found member"));
-            MatchingMemberResponse matchingMemberResponse = memberMapper.toResponse(member, mentorPercent);
+            List<Review> reviewList = reviewRepository.findAllByMentor(member.getNickname());
+            MatchingMemberResponse matchingMemberResponse = memberMapper.toResponse(member, mentorPercent,reviewList);
             memberResponses.add(matchingMemberResponse);
         }
         return memberResponses;
