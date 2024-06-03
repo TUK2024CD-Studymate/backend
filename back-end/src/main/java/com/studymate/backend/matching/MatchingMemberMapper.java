@@ -4,9 +4,11 @@ import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.file.domain.ProfileImg;
 import com.studymate.backend.matching.dto.MatchingMemberResponse;
 import com.studymate.backend.member.domain.Member;
+import com.studymate.backend.review.domain.Review;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -14,7 +16,7 @@ import java.util.Optional;
 public class MatchingMemberMapper {
 
     private final ProfileImgRepository profileImgRepository;
-    public MatchingMemberResponse toResponse(Member member, Double percent) {
+    public MatchingMemberResponse toResponse(Member member, Double percent, List<Review> reviewList) {
         String imageName = "프로필 사진이 없습니다";
 
         if (member == null) return null;
@@ -29,11 +31,11 @@ public class MatchingMemberMapper {
                 .email(member.getEmail())
                 .part(member.getPart())
                 .nickname(member.getNickname())
+                .reviewCount(reviewList.size())
                 .interests(member.getInterests())
                 .imageUrl(imageName)
                 .name(member.getName())
                 .blogUrl(member.getBlogUrl())
-                .reviewCount(member.getReviewCount())
                 .expertiseField(member.getExpertiseField())
                 .tel(member.getTel())
                 .publicRelations(member.getPublicRelations())
