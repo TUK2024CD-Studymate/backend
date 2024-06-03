@@ -116,10 +116,8 @@ public class MemberService {
         if (review.getHeart()) {
             mentor.updateHeart();
         }
-        mentor.updateReviewCount();
         mentor.updateMatchingCount();
         mentor.setStarNum(review.getStar());
-        mentor.setStarAverage(mentor.getReviewCount());
     }
 
     @Transactional
@@ -137,6 +135,5 @@ public class MemberService {
             mentor.updateHeart();
         }
         mentor.updateStarNum(review.getStar(), request.getStar());
-        mentor.setStarAverage(mentor.getReviewCount());
     }
 }
