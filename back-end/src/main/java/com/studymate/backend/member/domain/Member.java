@@ -39,8 +39,6 @@ public class Member extends BaseTimeEntity{
     @Column
     private int matchingCount;
     @Column
-    private int reviewCount;
-    @Column
     private int heart;
     private String expertiseField;
     @Column
@@ -107,10 +105,6 @@ public class Member extends BaseTimeEntity{
 
     public void setStarNum(int star) {
         this.star += star;
-    }
-
-    public void updateReviewCount() {
-        this.reviewCount++;
     }
 
     public void updateMatchingCount() {
