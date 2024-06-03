@@ -4,7 +4,7 @@ import com.studymate.backend.matching.dto.MatchingMemberResponse;
 import com.studymate.backend.matching.service.MatchingService;
 import com.studymate.backend.member.dto.MemberListResponse;
 import com.studymate.backend.member.dto.MemberResponse;
-import com.studymate.backend.review.dto.ReviewResponse;
+import com.studymate.backend.review.dto.ReviewResponseList;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -49,7 +49,7 @@ public class MatchingController {
     @GetMapping("/matching/review/{mentorId}")
     @Operation(summary = "멘토의 리뷰들 조회", description = "해당 멘토에게 쓰여진 리뷰들을 불러온다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<List<ReviewResponse>> matching(@PathVariable("mentorId") Long mentorId) {
+    public ResponseEntity<ReviewResponseList> matching(@PathVariable("mentorId") Long mentorId) {
         return ResponseEntity.ok().body(matchingService.searchMentorReview(mentorId));
     }
 
