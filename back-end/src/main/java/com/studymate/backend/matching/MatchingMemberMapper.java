@@ -2,7 +2,8 @@ package com.studymate.backend.matching;
 
 import com.studymate.backend.file.ProfileImgRepository;
 import com.studymate.backend.file.domain.ProfileImg;
-import com.studymate.backend.matching.dto.MatchingMemberResponse;
+import com.studymate.backend.matching.dto.AiMatchingMemberResponse;
+import com.studymate.backend.matching.dto.KmpMatchingMemberResponse;
 import com.studymate.backend.member.domain.Member;
 import com.studymate.backend.review.domain.Review;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Optional;
 public class MatchingMemberMapper {
 
     private final ProfileImgRepository profileImgRepository;
-    public MatchingMemberResponse toResponse(Member member, Double percent, List<Review> reviewList) {
+    public AiMatchingMemberResponse toResponseForAi(Member member, Double percent, List<Review> reviewList) {
         String imageName = "프로필 사진이 없습니다";
 
         if (member == null) return null;
@@ -26,7 +27,7 @@ public class MatchingMemberMapper {
             imageName = profileImg.get().getUrl();
         }
 
-        return MatchingMemberResponse.builder()
+        return AiMatchingMemberResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .part(member.getPart())
@@ -46,6 +47,38 @@ public class MatchingMemberMapper {
                 .solved(member.getSolved())
                 .matchingCount(member.getMatchingCount())
                 .matchingPercent(percent)
+                .build();
+    }
+
+    public KmpMatchingMemberResponse toResponseForKmp(Member member, List<Review> reviewList) {
+        String imageName = "프로필 사진이 없습니다";
+
+        if (member == null) return null;
+
+        if (profileImgRepository.findByMember(member).isPresent()) {
+            Optional<ProfileImg> profileImg = profileImgRepository.findByMember(member);
+            imageName = profileImg.get().getUrl();
+        }
+
+        return KmpMatchingMemberResponse.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .part(member.getPart())
+                .nickname(member.getNickname())
+                .reviewCount(reviewList.size())
+                .interests(member.getInterests())
+                .imageUrl(imageName)
+                .name(member.getName())
+                .blogUrl(member.getBlogUrl())
+                .expertiseField(member.getExpertiseField())
+                .tel(member.getTel())
+                .publicRelations(member.getPublicRelations())
+                .job(member.getJob())
+                .isLogin(member.isLogin())
+                .heart(member.getHeart())
+                .starAverage(member.getStarAverage())
+                .solved(member.getSolved())
+                .matchingCount(member.getMatchingCount())
                 .build();
     }
 }
