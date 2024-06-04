@@ -1,18 +1,16 @@
-package com.studymate.backend.member.dto;
+package com.studymate.backend.matching.dto;
 
 import com.studymate.backend.member.domain.Interests;
 import com.studymate.backend.member.domain.Part;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-
-@AllArgsConstructor
 @Builder
 @Getter
-public class MemberResponse {
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class KmpMatchingMemberResponse {
     private Long id;
     private String name;
     private String nickname;
@@ -29,5 +27,6 @@ public class MemberResponse {
     private BigDecimal starAverage;
     private int solved;
     private int matchingCount;
+    private int reviewCount;
     private boolean isLogin;
 }

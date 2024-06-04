@@ -8,7 +8,8 @@ import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
 import com.studymate.backend.matching.MatchingMemberMapper;
 import com.studymate.backend.matching.dto.JsonMentorResponse;
-import com.studymate.backend.matching.dto.MatchingMemberResponse;
+import com.studymate.backend.matching.dto.AiMatchingMemberResponse;
+import com.studymate.backend.matching.dto.KmpMatchingMemberResponse;
 import com.studymate.backend.matching.dto.MatchingSseResponse;
 import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Interests;
@@ -58,7 +59,7 @@ public class MatchingService {
     private final ReviewMapper reviewMapper;
     private final ChatService chatService;
     private final RestTemplate restTemplate;
-    private final MatchingMemberMapper memberMapper;
+    private final MatchingMemberMapper matchingMemberMapper;
     @Value("${openai.model}")
     private String model;
     @Value("${openai.api.url}")
@@ -170,7 +171,7 @@ public class MatchingService {
      * 3.3. 문자열이 일치하다고 판단(KMP)되면 저장변수에 + 1
      * 4. 모든 검색을 마친 후 가장 높은 점수를 받은 멘토 들을 내림차순으로 출력.
      */
-    public List<MemberResponse> getMentorListByKeyword(Long questionId) {
+    public List<KmpMatchingMemberResponse> getMentorListByKeyword(Long questionId) {
         //1
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("not found question id"));
@@ -187,10 +188,10 @@ public class MatchingService {
         Collections.addAll(field, tokens);
 
         //3.2 ~ 3.3
-        Map<MemberResponse, Integer> matchingCountsByPR = new HashMap<>();
-        Map<MemberResponse, Integer> matchingCountsByExField = new HashMap<>();
+        Map<KmpMatchingMemberResponse, Integer> matchingCountsByPR = new HashMap<>();
+        Map<KmpMatchingMemberResponse, Integer> matchingCountsByExField = new HashMap<>();
 
-        List<MemberResponse> result = new ArrayList<>();
+        List<KmpMatchingMemberResponse> result = new ArrayList<>();
         for (MemberResponse mentor : mentorList) {
             int matchingCountByPR = 0;
             int matchingCountByExField = 0;
@@ -208,17 +209,26 @@ public class MatchingService {
                 }
             }
             if (matchingCountByPR > 0) {
-                matchingCountsByPR.put(mentor, matchingCountByPR);
+                Member findMentor = memberRepository.findByNickname(mentor.getNickname());
+                List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
+                KmpMatchingMemberResponse response = matchingMemberMapper.toResponseForKmp(findMentor, reviews);
+                matchingCountsByPR.put(response, matchingCountByPR);
             }
             if (matchingCountByExField > 0) {
-                matchingCountsByExField.put(mentor, matchingCountByPR);
+                Member findMentor = memberRepository.findByNickname(mentor.getNickname());
+                List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
+                KmpMatchingMemberResponse response = matchingMemberMapper.toResponseForKmp(findMentor, reviews);
+                matchingCountsByExField.put(response, matchingCountByPR);
             }
             if (matchingCountByPR > 0 || matchingCountByExField > 0) {
+                Member findMentor = memberRepository.findByNickname(mentor.getNickname());
+                List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
+                KmpMatchingMemberResponse response = matchingMemberMapper.toResponseForKmp(findMentor, reviews);
                 log.info("mentor:{}", mentor.getNickname());
                 log.info("mentorsPRCount:{}", matchingCountByPR);
                 log.info("mentorsExCount:{}", matchingCountByExField);
                 log.info("SUM:{}", matchingCountByPR + matchingCountByExField);
-                result.add(mentor);
+                result.add(response);
             }
         }
 
@@ -231,9 +241,14 @@ public class MatchingService {
 
         if (result.isEmpty()) {
             mentorList.sort(Comparator.comparingInt(MemberResponse::getHeart).reversed());
-            result.addAll(mentorList.subList(0, Math.min(5, mentorList.size())));
+            for (int i = 0; i < Math.min(5, mentorList.size()); i++) {
+                MemberResponse mentor = mentorList.get(i);
+                Member findMentor = memberRepository.findByNickname(mentor.getNickname());
+                List<Review> reviews = reviewRepository.findAllByMentor(mentor.getNickname());
+                KmpMatchingMemberResponse response = matchingMemberMapper.toResponseForKmp(findMentor, reviews);
+                result.add(response);
+            }
         }
-
         return result;
     }
 
@@ -281,9 +296,9 @@ public class MatchingService {
         return lps;
     }
 
-    public List<MatchingMemberResponse> getMentorListByAi(Long questionId) {
+    public List<AiMatchingMemberResponse> getMentorListByAi(Long questionId) {
         Map<Long, Double> mentorMatchMap = new HashMap<>();
-        List<MatchingMemberResponse> memberResponses = new ArrayList<>();
+        List<AiMatchingMemberResponse> memberResponses = new ArrayList<>();
 
         MemberListResponse mentorList = getMentorList(questionId);
 
@@ -343,8 +358,8 @@ public class MatchingService {
             Member member = memberRepository.findById(mentorId)
                     .orElseThrow(() -> new RuntimeException("not found member"));
             List<Review> reviewList = reviewRepository.findAllByMentor(member.getNickname());
-            MatchingMemberResponse matchingMemberResponse = memberMapper.toResponse(member, mentorPercent,reviewList);
-            memberResponses.add(matchingMemberResponse);
+            AiMatchingMemberResponse aiMatchingMemberResponse = matchingMemberMapper.toResponseForAi(member, mentorPercent,reviewList);
+            memberResponses.add(aiMatchingMemberResponse);
         }
         return memberResponses;
     }
