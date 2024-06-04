@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchingMemberResponse {
+public class AiMatchingMemberResponse {
     private Long id;
     private String name;
     private String nickname;
