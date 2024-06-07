@@ -3,6 +3,7 @@ package com.studymate.backend.matching.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.studymate.backend.chat.domain.ChatRoom;
 import com.studymate.backend.chat.service.ChatService;
 import com.studymate.backend.global.gpt.dto.GPTRequest;
 import com.studymate.backend.global.gpt.dto.GPTResponse;
@@ -27,15 +28,13 @@ import com.studymate.backend.review.domain.Review;
 import com.studymate.backend.review.dto.ReviewResponseList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.java_sdk.api.Message;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.KakaoOption;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -100,47 +99,47 @@ public class MatchingService {
         return mentorList;
     }
 
-    public String matchingForSms(Long questionId, Long mentorId) {
-        Member member = memberService.getMember();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        Message coolsms = new Message(apiKey, apiSecret);
-
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("not found question"));
-
-        Member mentor = memberRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("not found mentor"));
-
-        String to = mentor.getTel();
-
-        HashMap<String, String> message = makeParams(to, question, mentor);
-
-        try {
-            JSONObject obj = (JSONObject) coolsms.send(message);
-            System.out.println(obj.toString());
-        } catch (CoolsmsException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCode());
-        }
-
-        MatchingSseResponse matchingSseResponse = MatchingSseResponse.builder()
-                .nickname(member.getNickname()) // 사용자 닉네임
-                .question_id(question.getId()) // 게시물 ID
-                .likedTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(formatter))
-                .build();
-
-        notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
-
-        // 채팅방 생성
-        Long chatRoomId = chatService.createChatRoom(mentor.getNickname() + " & " + question.getMember().getNickname()).getId();
-        // 멘토와 멘티 채팅방 참여
-        chatService.addUserToRoom(chatRoomId, mentorId);
-        chatService.addUserToRoom(chatRoomId, question.getMember().getId());
-
-        return mentor.getNickname() + "님에게 전송문자 전송을 하였습니다.";
-
-    }
+//    public String matchingForSms(Long questionId, Long mentorId) {
+//        Member member = memberService.getMember();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//
+//        Message coolsms = new Message(apiKey, apiSecret);
+//
+//        Question question = questionRepository.findById(questionId)
+//                .orElseThrow(() -> new RuntimeException("not found question"));
+//
+//        Member mentor = memberRepository.findById(mentorId)
+//                .orElseThrow(() -> new RuntimeException("not found mentor"));
+//
+//        String to = mentor.getTel();
+//
+//        HashMap<String, String> message = makeParams(to, question, mentor);
+//
+//        try {
+//            JSONObject obj = (JSONObject) coolsms.send(message);
+//            System.out.println(obj.toString());
+//        } catch (CoolsmsException e) {
+//            System.out.println(e.getMessage());
+//            System.out.println(e.getCode());
+//        }
+//
+//        MatchingSseResponse matchingSseResponse = MatchingSseResponse.builder()
+//                .nickname(member.getNickname()) // 사용자 닉네임
+//                .question_id(question.getId()) // 게시물 ID
+//                .likedTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(formatter))
+//                .build();
+//
+//        notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
+//
+//        // 채팅방 생성
+//        Long chatRoomId = chatService.createChatRoom(mentor.getNickname() + " & " + question.getMember().getNickname()).getId();
+//        // 멘토와 멘티 채팅방 참여
+//        chatService.addUserToRoom(chatRoomId, mentorId);
+//        chatService.addUserToRoom(chatRoomId, question.getMember().getId());
+//
+//        return mentor.getNickname() + "님에게 전송문자 전송을 하였습니다.";
+//
+//    }
 
     private HashMap<String, String> makeParams(String to, Question question, Member mentor) {
         HashMap<String, String> params = new HashMap<>();
@@ -436,14 +435,17 @@ public class MatchingService {
 
         notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
 
-        // 채팅방 생성
-        Long chatRoomId = chatService.createChatRoom(mentor.getNickname() + " & " + question.getMember().getNickname()).getId();
-        // 멘토와 멘티 채팅방 참여
-        chatService.addUserToRoom(chatRoomId, mentorId);
-        chatService.addUserToRoom(chatRoomId, question.getMember().getId());
+        // 채팅방 생성 및 멘토와 멘티 채팅방 참여 처리
+        Pair<ChatRoom, Boolean> chatRoomResult = chatService.createChatRoom(member.getNickname(), mentor.getNickname());
+        Long chatRoomId = chatRoomResult.getFirst().getId();
+        boolean isNewRoom = chatRoomResult.getSecond();
 
+        if (isNewRoom) {
+            chatService.addUserToRoom(chatRoomId, mentorId);
+            chatService.addUserToRoom(chatRoomId, question.getMember().getId());
+        }
 
-        return mentor.getNickname()+"에게 알림톡을 보냈습니다.";
+        return mentor.getNickname() + "에게 알림톡을 보냈습니다.";
     }
 
     public void messageInfo(Member mentor, Question question, Member member) {
