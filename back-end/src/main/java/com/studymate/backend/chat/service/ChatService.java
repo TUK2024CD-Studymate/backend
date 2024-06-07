@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +39,9 @@ public class ChatService {
 
     @Transactional
     public Pair<ChatRoom, Boolean> createChatRoom(String userNickname, String targetNickname) {
-        String chatRoomName = String.format("%s & %s", userNickname, targetNickname);
+        String[] nicknames = {userNickname, targetNickname};
+        Arrays.sort(nicknames);
+        String chatRoomName = String.format("%s & %s", nicknames[0], nicknames[1]);
         Optional<ChatRoom> existingRoom = chatRoomRepository.findByName(chatRoomName);
         if (existingRoom.isPresent()) {
             return Pair.of(existingRoom.get(), false); // 이미 존재하는 채팅방 반환
@@ -65,25 +68,6 @@ public class ChatService {
             userChatRoomRepository.save(newUserChatRoom);
         }
     }
-
-
-
-    @Transactional
-    public void createUserChatRoom(Member member, Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chatRoomId));
-        UserChatRoom newUserChatRoom = chatMapper.toUserChatRoom(member, chatRoom);
-        userChatRoomRepository.save(newUserChatRoom);
-    }
-
-    @Transactional
-    public void addUserToRoom(Long roomId, Long memberId) {
-        UserChatRoom userChatRoom = new UserChatRoom();
-        userChatRoom.setChatRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found")));
-        userChatRoom.setMember(memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found")));
-        userChatRoomRepository.save(userChatRoom);
-    }
-
     @Transactional
     public List<ChatRoomRes> findUserChatRoomByMemberId(Long memberId) {
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findByMemberId(memberId);
