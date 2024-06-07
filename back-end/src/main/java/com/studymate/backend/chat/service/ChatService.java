@@ -14,11 +14,13 @@ import com.studymate.backend.member.MemberRepository;
 import com.studymate.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,24 +36,43 @@ public class ChatService {
     private final MessageService messageService;
 
 
-
-
     @Transactional
-    public ChatRoom createChatRoom(String chatRoomName) {
+    public Pair<ChatRoom, Boolean> createChatRoom(String userNickname, String targetNickname) {
+        String chatRoomName = String.format("%s & %s", userNickname, targetNickname);
+        Optional<ChatRoom> existingRoom = chatRoomRepository.findByName(chatRoomName);
+        if (existingRoom.isPresent()) {
+            return Pair.of(existingRoom.get(), false); // 이미 존재하는 채팅방 반환
+        }
+
         ChatRoom newChatRoom = ChatRoom.builder()
-                .name(chatRoomName) // 이름 설정
+                .name(chatRoomName)
                 .build();
         chatRoomRepository.save(newChatRoom);
 
-        return newChatRoom;
+        // 채팅방에 멤버 추가
+        addMemberToRoom(newChatRoom, userNickname);
+        addMemberToRoom(newChatRoom, targetNickname);
+
+        return Pair.of(newChatRoom, true); // 새로 생성된 채팅방 반환
     }
+
+    private void addMemberToRoom(ChatRoom chatRoom, String nickname) {
+        Member member = memberRepository.findByNickname(nickname);
+        if (member != null) {
+            UserChatRoom newUserChatRoom = new UserChatRoom();
+            newUserChatRoom.setMember(member);
+            newUserChatRoom.setChatRoom(chatRoom);
+            userChatRoomRepository.save(newUserChatRoom);
+        }
+    }
+
+
 
     @Transactional
     public void createUserChatRoom(Member member, Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅룸 아이디에 해당하는 채팅룸이 존재하지 않습니다: " + chatRoomId));
         UserChatRoom newUserChatRoom = chatMapper.toUserChatRoom(member, chatRoom);
-
         userChatRoomRepository.save(newUserChatRoom);
     }
 
@@ -62,11 +83,6 @@ public class ChatService {
         userChatRoom.setMember(memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found")));
         userChatRoomRepository.save(userChatRoom);
     }
-
-    public boolean duplicatedUserChatRoom(Member member) {
-        return userChatRoomRepository.existsByMemberId(member.getId());
-    }
-
 
     @Transactional
     public List<ChatRoomRes> findUserChatRoomByMemberId(Long memberId) {
@@ -117,18 +133,19 @@ public class ChatService {
     @Transactional
     public List<ChatMessageRes> findChatMessage(Long chatRoomId, Long memberId) {
         List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
-        messageService.updateUserReadPosition(chatRoomId.toString(), memberId.toString(), getLastMessageId(chatMessages));
-        // 다시 메시지를 로드하거나, 업데이트가 반영되기를 기다린 후 메시지 목록을 반환
-        chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId);
+        String lastMessageId = getLastMessageId(chatMessages);
+        messageService.updateUserReadPosition(chatRoomId.toString(), memberId.toString(), lastMessageId, false); // 'false'로 설정하여 메시지 읽음 상태 변경을 허용하지 않음
+        // 업데이트를 기다리지 않고 캐시된 최신 읽음 위치를 바로 사용
         String lastReadMessageId = messageService.getUserLastReadPosition(chatRoomId.toString(), memberId.toString());
         return chatMapper.toChatMessageList(chatMessages, lastReadMessageId);
     }
 
-    private String getLastMessageId(List<ChatMessage> messages) {
-        if (!messages.isEmpty()) {
-            return messages.get(messages.size() - 1).getId().toString();
+    private String getLastMessageId(List<ChatMessage> chatMessages) {
+        if (!chatMessages.isEmpty()) {
+            return String.valueOf(chatMessages.get(chatMessages.size() - 1).getId());
         }
-        return "";
+        return "0"; // 빈 목록일 경우 "0" 반환
     }
+
 
 }

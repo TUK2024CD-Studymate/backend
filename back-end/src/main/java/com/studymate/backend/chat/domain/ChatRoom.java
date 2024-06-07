@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 @Entity
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,7 +30,6 @@ public class ChatRoom extends BaseTimeEntity {
     @OneToMany(mappedBy = "chatRoom", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private final List<UserChatRoom> userChatRoomList = new ArrayList<>();
 
-    // Lombok의 @Builder를 사용할 때 필드 추가를 반영하기 위한 빌더 패턴 설정
     @Builder
     public ChatRoom(Long id, String name, List<ChatMessage> chatMessageList, List<UserChatRoom> userChatRoomList) {
         this.id = id;

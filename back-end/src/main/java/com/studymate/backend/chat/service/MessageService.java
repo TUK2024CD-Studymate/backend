@@ -22,7 +22,7 @@ public class MessageService {
     }
 
     @Transactional
-    public void updateUserReadPosition(String roomId, String userId, String lastMessageId) {
+    public void updateUserReadPosition(String roomId, String userId, String lastMessageId, boolean setRead) {
         HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
         hashOperations.put("userLastRead:" + roomId, userId, lastMessageId);
 

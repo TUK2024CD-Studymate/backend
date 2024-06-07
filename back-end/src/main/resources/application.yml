@@ -52,6 +52,39 @@ spring:
       port: 6379
       ssl:
         enabled: true
+  rabbitmq:
+    host: rabbit
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 10000
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 3
+        max-concurrency: 10
+        prefetch: 1
+        default-requeue-rejected: false
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-interval: 10000
+        multiplier: 2.0
+        max-attempts: 3
+
+    stomp:
+      broker-relay:
+        host: rabbitmq
+        port: 61613
+        virtual-host: /
+        user: guest
+        password: guest
+        login: guest
+        passcode: guest
+        relay-host: rabbit
+        relay-port: 61613
 
 logging:
   level:
