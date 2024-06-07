@@ -73,6 +73,7 @@ public class SecurityConfig{
                         .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/logout").permitAll()
                         .requestMatchers("/api/subscribe/**").permitAll()
+                        .requestMatchers("/localhost:15672/").permitAll()   // rabbitmq UI
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement
