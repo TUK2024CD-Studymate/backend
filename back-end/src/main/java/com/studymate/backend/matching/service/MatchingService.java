@@ -440,9 +440,8 @@ public class MatchingService {
         Long chatRoomId = chatRoomResult.getFirst().getId();
         boolean isNewRoom = chatRoomResult.getSecond();
 
-        if (isNewRoom) {
-            chatService.addUserToRoom(chatRoomId, mentorId);
-            chatService.addUserToRoom(chatRoomId, question.getMember().getId());
+        if (!isNewRoom) {
+            return mentor.getNickname() + "와의 채팅방이 이미 존재합니다.";
         }
 
         return mentor.getNickname() + "에게 알림톡을 보냈습니다.";

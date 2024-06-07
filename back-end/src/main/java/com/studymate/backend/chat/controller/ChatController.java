@@ -33,25 +33,17 @@ public class ChatController {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
 
+
     @Operation(summary = "chatroom create", description = "채팅방 생성")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "성공"))
     @PostMapping
-    public ResponseEntity<?> createChatRoom(@RequestHeader("Authorization") String authHeader, @RequestParam String targetNickname) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String token = authHeader.substring(7); // "Bearer " 제거
-        Authentication authentication = tokenProvider.getAuthentication(token);
-
-        if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String email = ((User) authentication.getPrincipal()).getUsername();
+    public ResponseEntity<?> createChatRoom(@RequestParam String targetNickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
         Member member = memberRepository.findByEmail(email);
 
         if (member == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Member not found");
         }
 
         String userNickname = member.getNickname(); // 멤버 객체에서 닉네임 추출
@@ -65,7 +57,7 @@ public class ChatController {
         ChatRoom chatRoom = result.getFirst();
         boolean isNewRoom = result.getSecond();
 
-        HttpStatus status = isNewRoom ? HttpStatus.CREATED : HttpStatus.OK;
+        HttpStatus status = isNewRoom ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
         ChatRoomRes chatRoomRes = ChatRoomRes.builder()
                 .chatRoomId(chatRoom.getId())
                 .chatRoomName(chatRoom.getName())
@@ -76,7 +68,7 @@ public class ChatController {
 
 
     @Transactional
-    @GetMapping("/api/chat/rooms/{chatRoomId}/contents")
+    @GetMapping("/{chatRoomId}/contents")
     public ResponseEntity<?> enterChatRoom(@PathVariable Long chatRoomId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
@@ -96,19 +88,9 @@ public class ChatController {
     @Operation(summary = "ChatRoomList read", description = "채팅방 목록 조회")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
     @GetMapping("/list")
-    public ResponseEntity<List<ChatRoomRes>> getChatRoomList(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String token = authHeader.substring(7);
-        Authentication authentication = tokenProvider.getAuthentication(token);
-
-        if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User principal = (User) authentication.getPrincipal();
-        String email = principal.getUsername(); // JWT에서 추출된 사용자 이메일을 가져옵니다.
+    public ResponseEntity<List<ChatRoomRes>> getChatRoomList() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername();
         Member member = memberRepository.findByEmail(email);
 
         if (member == null) {

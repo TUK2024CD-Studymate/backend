@@ -26,5 +26,6 @@ public class ChatRoomRes {
         private String expertiseField;
         private List<String> interests; // 가정: interests가 문자열 리스트로 표현됨
         private boolean isLogin;
+        private String profileImageUrl;
     }
 }

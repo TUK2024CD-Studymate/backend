@@ -17,4 +17,5 @@ public class ChatMessageRes {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime sendDate;
     private boolean isRead;  // 읽음 여부
+    private String profileImageUrl;
 }
