@@ -26,7 +26,7 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name="user_id",updatable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Heart> heart;
 
     @Column(length = 30)
