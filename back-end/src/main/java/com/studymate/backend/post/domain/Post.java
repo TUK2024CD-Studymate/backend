@@ -18,7 +18,7 @@ import java.util.List;
 @ToString
 public class Post extends BaseTimeEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // MySQL에 맞는 전략 명시
     @Column(name = "post_id")
     private Long id;
 
@@ -44,7 +44,6 @@ public class Post extends BaseTimeEntity {
 
     private Boolean recruitmentStatus;
 
-
     public void update(String title, String content, Category category, Interests interests, Boolean recruitmentStatus){
         this.title = title;
         this.content = content;
@@ -54,5 +53,5 @@ public class Post extends BaseTimeEntity {
             this.recruitmentStatus = recruitmentStatus;
         }
     }
-
 }
+

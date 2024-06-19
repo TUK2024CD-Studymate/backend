@@ -39,6 +39,12 @@ public class ChatService {
 
     @Transactional
     public Pair<ChatRoom, Boolean> createChatRoom(String userNickname, String targetNickname) {
+
+        // 자기 자신에게 채팅 요청하는 경우 예외 처리
+        if (userNickname.equals(targetNickname)) {
+            throw new IllegalArgumentException("자신과 채팅방을 생성할 수 없습니다.");
+        }
+
         String[] nicknames = {userNickname, targetNickname};
         Arrays.sort(nicknames);
         String chatRoomName = String.format("%s & %s", nicknames[0], nicknames[1]);
