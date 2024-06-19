@@ -33,7 +33,7 @@ public class PostMapper {
     }
 
     public PostResponseDto toResponse(Post post) {
-        String profileUrl = "https://studymate154.s3.ap-northeast-2.amazonaws.com/%ED%94%84%EB%A1%9C%ED%95%84+%EA%B8%B0%EB%B3%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png";
+        String profileUrl = "https://studymate-bucket.s3.ap-northeast-2.amazonaws.com/profileImg.png";
         if (post == null) return null;
 
         // 댓글 수 조회
