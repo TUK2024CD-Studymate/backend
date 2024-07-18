@@ -387,12 +387,8 @@ public class MatchingService {
     }
 
     public String gptConvert(String questionContent, String mentorInfo, Interests interests) {
-        Member member = memberRepository.findById(406L).orElseThrow(() -> new RuntimeException("not found PH"));
-        Long id = member.getId();
-        String pr = member.getPublicRelations();
-        String ex = member.getExpertiseField();
         if (interests==Interests.WEBAPP) {
-            GPTRequest gptRequest = new GPTRequest(model, questionContent+FIRST+id+pr+ex+mentorInfo+FINAL,
+            GPTRequest gptRequest = new GPTRequest(model, questionContent+FIRST+mentorInfo+FINAL,
                     1, 4000, 1, 2, 2);
             GPTResponse response = restTemplate.postForObject(apiURL, gptRequest, GPTResponse.class);
             return response.getChoices().get(0).getMessage().getContent();
