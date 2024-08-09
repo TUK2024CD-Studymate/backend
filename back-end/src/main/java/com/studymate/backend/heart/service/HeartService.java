@@ -33,6 +33,7 @@ public class HeartService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("not found post id"));
+        Member userInfo = post.getMember();
 
         if (heartRepository.findByMemberAndPost(member, post).isPresent()) {
             throw new Exception();
@@ -53,6 +54,10 @@ public class HeartService {
 
         // 게시물 작성자에게 구체적인 알림 데이터 보내기
         notificationService.customNotify(post.getMember(), likeSseResponse, "작성하신 게시글에 좋아요가 달렸습니다.", "Like");
+        if (!member.getNickname().contains(userInfo.getNickname())) {
+            notificationService.saveNotification(member, userInfo, "heart");
+        }
+
 
         HeartResponse response = heartMapper.toResponse(heart);
         return response;
