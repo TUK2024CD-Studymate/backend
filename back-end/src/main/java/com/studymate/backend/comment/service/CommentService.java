@@ -35,6 +35,7 @@ public class CommentService {
     public CommentResponse save(CommentRequest request, Post post) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Member member = memberService.getMember();
+        Member userInfo = post.getMember();
         Comment comment = request.toEntity(member, post);
         Comment savedComment = commentRepository.save(comment);
 
@@ -46,8 +47,12 @@ public class CommentService {
         // 게시물 작성자에게 보낼 메시지 생성
         String notificationMessage = member.getNickname() + "님이 댓글을 달았습니다.";
 
+        if (!member.getNickname().contains(userInfo.getNickname())) {
+            notificationService.saveNotification(member,userInfo, "comment");
+        }
         // 게시물 작성자에게 알림 보내기
         notificationService.customNotify(post.getMember(), commentSseResponse, notificationMessage, "Comment");
+
 
         return CommentResponse.toResponse(savedComment, profileImgRepository);
     }

@@ -30,14 +30,6 @@ public class MatchingController {
         return ResponseEntity.ok().body(matchingService.getMentorList(questionId));
     }
 
-//    @GetMapping("/matching/{questionId}/{mentorId}")
-//    @Operation(summary = "멘토 매칭 알림", description = "해당 멘토에게 LMS알림을 전송한다.")
-//    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-//    public ResponseEntity<String> alarmByLms(@PathVariable("questionId") Long questionId,
-//                                           @PathVariable("mentorId") Long mentorId) {
-//        return ResponseEntity.ok().body(matchingService.matchingForSms(questionId, mentorId));
-//    }
-
     @GetMapping("/matching/kakao/{questionId}/{mentorId}")
     @Operation(summary = "멘토 매칭 알림톡", description = "해당 멘토에게 카카오톡 알림을 전송한다.")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))

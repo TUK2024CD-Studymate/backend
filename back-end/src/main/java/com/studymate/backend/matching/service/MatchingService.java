@@ -431,6 +431,8 @@ public class MatchingService {
 
         notificationService.customNotify(mentor, matchingSseResponse, "매칭 요청을 보냈습니다.", "Matching");
 
+        notificationService.saveNotification(member, mentor, "matching");
+
         // 채팅방 생성 및 멘토와 멘티 채팅방 참여 처리
         Pair<ChatRoom, Boolean> chatRoomResult = chatService.createChatRoom(member.getNickname(), mentor.getNickname());
         Long chatRoomId = chatRoomResult.getFirst().getId();
