@@ -110,6 +110,7 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteNotification() {
         Member member = memberService.getMember();
 
