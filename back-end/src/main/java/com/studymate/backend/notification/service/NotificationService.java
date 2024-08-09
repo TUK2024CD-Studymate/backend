@@ -114,6 +114,6 @@ public class NotificationService {
     public void deleteNotification() {
         Member member = memberService.getMember();
 
-        notificationRepository.deleteById(member.getId());
+        notificationRepository.deleteAllByMember(member);
     }
 }
