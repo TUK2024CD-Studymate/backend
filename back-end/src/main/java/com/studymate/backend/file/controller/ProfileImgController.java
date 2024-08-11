@@ -28,10 +28,10 @@ public class ProfileImgController {
         return ResponseEntity.status(HttpStatus.OK).body(s3UploadService.saveFile(profileImgUpload));
     }
 
-    @DeleteMapping("/delete")
-    @Operation(summary = "회원이 프로필 사진을 삭제한다.", description = "회원이 프로필 사진을 삭제한다.")
-    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
-    public ResponseEntity<String> delete() throws IOException {
-        return ResponseEntity.status(HttpStatus.OK).body(s3UploadService.deleteProfile());
-    }
+//    @DeleteMapping("/delete")
+//    @Operation(summary = "회원이 프로필 사진을 삭제한다.", description = "회원이 프로필 사진을 삭제한다.")
+//    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "성공"))
+//    public ResponseEntity<String> delete() throws IOException {
+//        return ResponseEntity.status(HttpStatus.OK).body(s3UploadService.deleteProfile());
+//    }
 }

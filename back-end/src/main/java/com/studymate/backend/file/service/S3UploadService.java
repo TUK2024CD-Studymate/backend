@@ -38,19 +38,12 @@ public class S3UploadService {
     public S3Url saveFile(MultipartFile multipartFile) throws IOException {
         Member member = memberService.getMember();
 
-        if (profileImgRepository.findByMember(member).isPresent()) {
-            /*
-            *   만약 수정시 기존 파일 삭제 및 재업로드
-            */
-            deleteProfile();
-            return uploadS3(multipartFile, member);
-        }else {
-            /*
-             *  프로필 사진이 없을 경우 새로운 리소스 생성
-             */
-            return uploadS3(multipartFile, member);
-        }
+        profileImgRepository.findByMember(member).ifPresent(profileImg -> {
+            deleteProfile(profileImg);
+        });
+        profileImgRepository.flush();
 
+        return uploadS3(multipartFile, member);
     }
 
     public S3Url uploadS3(MultipartFile multipartFile, Member member) throws IOException {
@@ -80,14 +73,10 @@ public class S3UploadService {
         return UUID.randomUUID() + fileName;
     }
 
-    public String deleteProfile() {
-        Member member = memberService.getMember();
-        ProfileImg profileImg = profileImgRepository.findByMember(member)
-                .orElseThrow(() -> new RuntimeException("NO_IMAGE_EXIST"));
-
+    public void deleteProfile(ProfileImg profileImg) {
         deleteFile(profileImg.getUrl());
         profileImgRepository.delete(profileImg);
-        return "정상적으로 삭제되었습니다.";
+        log.info("삭제완료 로그");
     }
 
     public void deleteFile(String fileUrl) {
