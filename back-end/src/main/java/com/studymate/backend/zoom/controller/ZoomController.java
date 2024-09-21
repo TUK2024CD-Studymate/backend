@@ -74,6 +74,7 @@ public class ZoomController {
         String accessToken = list.get("access_token");
         String refreshToken = list.get("refresh_token");
         zoomService.saveToken(accessToken, refreshToken);
+        log.info("ZoomResponse:{}", zoomText);
         log.info("accessToken:{}", accessToken);
         return "zoomLogin";
     }
